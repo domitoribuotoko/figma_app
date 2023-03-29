@@ -1,3 +1,4 @@
+import 'package:figma_app/screens/start_pages_controller.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -9,12 +10,10 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
-      ),
+    return MaterialApp(
+      theme: ThemeData(fontFamily: 'Baloo_Bhaijaan_2'),
+      debugShowCheckedModeBanner: false,
+      home: const StartPagesController(),
     );
   }
 }
