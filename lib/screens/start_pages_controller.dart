@@ -1,4 +1,6 @@
 import 'package:figma_app/base/app_constans.dart';
+import 'package:figma_app/base/app_methods.dart';
+import 'package:figma_app/screens/home_screen_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -21,11 +23,15 @@ class _StartPagesControllerState extends State<StartPagesController> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    metrix.screenHeight = size.height;
+    metrix.screenWidth = size.width;
     return Scaffold(
+      backgroundColor: colors.mainBackgrounColor,
       body: Stack(
         children: [
           PageView.builder(
-            // physics: const NeverScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             controller: _pageController,
             itemCount: 2,
             onPageChanged: (value) {
@@ -43,7 +49,7 @@ class _StartPagesControllerState extends State<StartPagesController> {
             },
           ),
           Padding(
-            padding: EdgeInsets.only(top: AppMetrix().screenHeight * .713270),
+            padding: EdgeInsets.only(top: method.vSizeCalc(602)),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List<Widget>.generate(
@@ -57,7 +63,7 @@ class _StartPagesControllerState extends State<StartPagesController> {
                         width: 50,
                         height: 10,
                         decoration: BoxDecoration(
-                          color: _activePage.value == index ? AppColors().mainColor : Colors.white,
+                          color: _activePage.value == index ? colors.mainColor : Colors.white,
                           borderRadius: BorderRadius.circular(10),
                         ),
                       );
@@ -80,11 +86,11 @@ class _StartPagesControllerState extends State<StartPagesController> {
     );
   }
 
-  showSheet() {
-    showModalBottomSheet(
+  showSheet() async {
+    await showModalBottomSheet(
       constraints: BoxConstraints(
-        maxHeight: AppMetrix().screenHeight * .503554,
-        maxWidth: AppMetrix().screenWidth,
+        maxHeight: method.vSizeCalc(425),
+        maxWidth: metrix.screenWidth,
       ),
       context: context,
       shape: const RoundedRectangleBorder(
@@ -111,29 +117,29 @@ class StarPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      backgroundColor: AppColors().mainBackgrounColor,
+      backgroundColor: colors.mainBackgrounColor,
       body: Center(
         child: Column(
           children: [
             Container(
               margin: EdgeInsets.only(
-                top: AppMetrix().screenHeight * .236966,
-                bottom: AppMetrix().screenHeight * .118483,
+                top: method.vSizeCalc(200),
+                bottom: method.vSizeCalc(100),
               ),
-              child: const Image(
-                height: 200,
+              child: Image(
+                height: method.vSizeCalc(200),
                 image: AssetImage(
-                  'lib/assets/images/star_and_ribbon.png',
+                  ppath.starPng,
                 ),
               ),
             ),
             Container(
               margin: EdgeInsets.only(
-                bottom: AppMetrix().screenHeight * .148104,
+                bottom: method.vSizeCalc(125),
               ),
               child: Text(
                 'Be the first',
-                style: AppTextStyles().mainTextStyle,
+                style: textStyles.mainTextStyle,
               ),
             ),
             TextButton(
@@ -149,7 +155,7 @@ class StarPage extends StatelessWidget {
               ),
               child: Text(
                 'Next',
-                style: AppTextStyles().blackMainTextStyle,
+                style: textStyles.blackMainTextStyle,
               ),
             ),
           ],
@@ -170,29 +176,29 @@ class DumbellPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      backgroundColor: AppColors().mainBackgrounColor,
+      backgroundColor: colors.mainBackgrounColor,
       body: Center(
         child: Column(
           children: [
             Container(
               margin: EdgeInsets.only(
-                top: AppMetrix().screenHeight * .315165,
-                bottom: AppMetrix().screenHeight * .118483,
+                top: method.vSizeCalc(266),
+                bottom: method.vSizeCalc(100),
               ),
-              child: const Image(
-                height: 134,
+              child: Image(
+                height: method.vSizeCalc(134),
                 image: AssetImage(
-                  'lib/assets/images/pink_dumbbell.png',
+                  ppath.dumbbPng,
                 ),
               ),
             ),
             Container(
               margin: EdgeInsets.only(
-                bottom: AppMetrix().screenHeight * .148104,
+                bottom: method.vSizeCalc(125),
               ),
               child: Text(
                 'Take care of yourself',
-                style: AppTextStyles().mainTextStyle,
+                style: textStyles.mainTextStyle,
               ),
             ),
             TextButton(
@@ -208,7 +214,7 @@ class DumbellPage extends StatelessWidget {
               ),
               child: Text(
                 'Start',
-                style: AppTextStyles().blackMainTextStyle,
+                style: textStyles.blackMainTextStyle,
               ),
             ),
           ],
@@ -219,60 +225,67 @@ class DumbellPage extends StatelessWidget {
 }
 
 class BottomAttentionSheet extends StatelessWidget {
-  const BottomAttentionSheet({super.key});
+  const BottomAttentionSheet({
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(
-        left: 20,
-        right: 20,
-        top: 10,
+      padding: EdgeInsets.only(
+        left: method.hSizeCalc(20),
+        right: method.hSizeCalc(20),
+        top: method.vSizeCalc(10),
       ),
       child: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const SizedBox(
-                width: 24,
+              SizedBox(
+                width: method.hSizeCalc(24),
               ),
               Text(
                 'Attention',
-                style: AppTextStyles().mainTextStyle,
+                style: textStyles.mainTextStyle,
               ),
               GestureDetector(
                 onTap: () {
                   Navigator.pop(context);
                 },
                 child: SvgPicture.asset(
-                  'lib/assets/svg/vector.svg',
+                  ipath.closeSvg,
                 ),
               ),
             ],
           ),
           Text(
-            AppLongStrings().attentionText,
-            style: const TextStyle(
+            longString.attentionText,
+            style: TextStyle(
               fontSize: 16,
+              height: 1.7 * method.ratio(),
             ),
           ),
           Padding(
-            padding: EdgeInsets.only(top: AppMetrix().screenHeight * .048578),
+            padding: EdgeInsets.only(top: method.vSizeCalc(41)),
             child: TextButton(
               onPressed: () {
-                // callback();
+                Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(
+                  builder: (context) {
+                    return const HomeScreenController();
+                  },
+                ), (route) => false);
               },
               style: TextButton.styleFrom(
-                backgroundColor: AppColors().mainBackgrounColor,
+                backgroundColor: colors.mainBackgrounColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20.0),
                 ),
-                minimumSize: const Size(178, 82),
+                minimumSize: Size(method.hSizeCalc(178), method.vSizeCalc(82)),
               ),
               child: Text(
                 'Start',
-                style: AppTextStyles().mainTextStyle,
+                style: textStyles.mainTextStyle,
               ),
             ),
           ),

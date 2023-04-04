@@ -1,7 +1,18 @@
 import 'package:figma_app/screens/start_pages_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-void main() {
+import 'base/app_methods.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await method.getPackageInfo();
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+    ),
+  );
   runApp(const MainApp());
 }
 
@@ -11,7 +22,9 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(fontFamily: 'Baloo_Bhaijaan_2'),
+      theme: ThemeData(
+        fontFamily: 'Baloo_Bhaijaan_2',
+      ),
       debugShowCheckedModeBanner: false,
       home: const StartPagesController(),
     );
