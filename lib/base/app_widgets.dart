@@ -65,7 +65,7 @@ double maxValue() {
 Widget cartesianChart(double size) {
   return SfCartesianChart(
     margin: const EdgeInsets.all(0),
-    series: getDefaultData( size),
+    series: getDefaultData(size),
     primaryXAxis: DateTimeAxis(
       isVisible: false,
     ),
@@ -113,7 +113,7 @@ List<SplineAreaSeries<SalesData, dynamic>> getDefaultData(double size) {
       ),
       animationDuration: 0,
       borderDrawMode: BorderDrawMode.top,
-      markerSettings:  MarkerSettings(
+      markerSettings: MarkerSettings(
         isVisible: true,
         borderColor: const Color(0xff88a2ff),
         color: Colors.white,

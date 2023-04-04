@@ -1,7 +1,6 @@
 import 'package:figma_app/base/app_constans.dart';
 import 'package:figma_app/base/app_widgets.dart';
 import 'package:figma_app/screens/home_screen_pages/graphs_page.dart';
-import 'package:figma_app/screens/test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -30,10 +29,10 @@ class _HomeScreenControllerState extends State<HomeScreenController> {
         },
         itemBuilder: (context, index) {
           return [
-            const SafeArea(
-              child: MyHomePage(),
+            SafeArea(
+              child: Container(),
             ),
-            const GraphsPage(),
+            const SafeArea(child: GraphsPage()),
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 5),
               child: SafeArea(

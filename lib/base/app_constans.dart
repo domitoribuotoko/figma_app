@@ -7,6 +7,7 @@ class AppColors {
   final Color circularGradientStart = const Color(0xffFED17B);
   final Color circularGradientEnd = const Color(0xffFFA800);
   final Color cartesianGradient = const Color(0xff547AFF);
+  final Color greyColor = const Color(0xff4E4E4E);
 }
 
 final colors = AppColors();
