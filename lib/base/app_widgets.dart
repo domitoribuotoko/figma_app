@@ -1,5 +1,6 @@
 import 'package:figma_app/base/app_constans.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'app_classes.dart';
 import 'app_methods.dart';
@@ -44,7 +45,7 @@ Widget circularChart() {
 }
 
 final List<SalesData> chartData = <SalesData>[
-  SalesData(0.1, 11, DateTime.now().subtract(const Duration(days: 0))),
+  SalesData(0.1, 11, DateTime.now()),
   SalesData(0.1, 11, DateTime.now().subtract(const Duration(days: 1))),
   SalesData(0.1, 10.5, DateTime.now().subtract(const Duration(days: 2))),
   SalesData(0.1, 11.6, DateTime.now().subtract(const Duration(days: 3))),
@@ -66,10 +67,22 @@ Widget cartesianChart(double size) {
   return SfCartesianChart(
     margin: const EdgeInsets.all(0),
     series: getDefaultData(size),
+    zoomPanBehavior: ZoomPanBehavior(
+      enablePanning: true,
+      zoomMode: ZoomMode.x,
+    ),
     primaryXAxis: DateTimeAxis(
       isVisible: false,
+      // visibleMaximum: DateTime.now(),
+      interval: 1,
+      intervalType: DateTimeIntervalType.days,
+      // visibleMinimum: DateTime.now().subtract(const Duration(days: 6)),
+      axisLine: const AxisLine(
+        width: 0,
+      ),
     ),
     primaryYAxis: NumericAxis(
+      // anchorRangeToVisiblePoints: false,
       visibleMaximum: maxValue(),
       interval: 1,
       isVisible: false,
@@ -78,6 +91,7 @@ Widget cartesianChart(double size) {
       ),
     ),
     plotAreaBorderWidth: 0,
+    // enableAxisAnimation: true,
     onMarkerRender: (MarkerRenderArgs args) {
       if (!(args.pointIndex == 2)) {
         args.markerHeight = 0.0;
@@ -145,4 +159,78 @@ List<SplineAreaSeries<SalesData, dynamic>> getDefaultData(double size) {
     //   // ),
     // ),
   ];
+}
+
+Widget tabButton({
+  required Function() ontap,
+  required Color buttonColor,
+  required Color textColor,
+  required String text,
+}) {
+  return TextButton(
+    onPressed: ontap,
+    style: TextButton.styleFrom(
+      backgroundColor: buttonColor,
+      foregroundColor: Colors.white.withOpacity(0.8),
+      minimumSize: Size(method.hSizeCalc(165), 41),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+    ),
+    child: Text(
+      text,
+      style: TextStyle(
+        fontSize: 20,
+        color: textColor,
+      ),
+    ),
+  );
+}
+
+Widget formField({
+  required String fieldName,
+  String hintText = 'Numeric',
+  required Function(String?) onSaved,
+  required String? Function(String?) validator,
+  List<TextInputFormatter>? inputFormatters,
+}) {
+  return Padding(
+    padding: EdgeInsets.only(
+      left: method.hSizeCalc(20),
+      right: method.hSizeCalc(20),
+      bottom: 30,
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          fieldName,
+          style: tS.main20TS,
+        ),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: TextFormField(
+            inputFormatters: inputFormatters,
+            decoration: InputDecoration(
+              hintText: hintText,
+              fillColor: Colors.white,
+              filled: true,
+              isDense: true,
+              border: InputBorder.none,
+              errorStyle: const TextStyle(
+                fontSize: 0,
+                height: 1,
+              ),
+            ),
+            style: TextStyle(
+              fontSize: 16,
+              color: colors.greyColor,
+            ),
+            onSaved: onSaved,
+            validator: validator,
+          ),
+        ),
+      ],
+    ),
+  );
 }

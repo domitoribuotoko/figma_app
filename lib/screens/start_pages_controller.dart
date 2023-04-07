@@ -23,9 +23,11 @@ class _StartPagesControllerState extends State<StartPagesController> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-    metrix.screenHeight = size.height;
-    metrix.screenWidth = size.width;
+    metrix.mediaQueryData = MediaQuery.of(context);
+    metrix.screenHeight = metrix.mediaQueryData.size.height;
+    metrix.screenWidth = metrix.mediaQueryData.size.width;
+    metrix.statusBarHeight = metrix.mediaQueryData.padding.top;
+    metrix.bottomNavBarHeight = method.vSizeCalc(30) + 35 + 28;
     return Scaffold(
       backgroundColor: colors.mainBackgrounColor,
       body: Stack(
@@ -139,7 +141,7 @@ class StarPage extends StatelessWidget {
               ),
               child: Text(
                 'Be the first',
-                style: textStyles.mainTextStyle,
+                style: tS.main36TS,
               ),
             ),
             TextButton(
@@ -155,7 +157,7 @@ class StarPage extends StatelessWidget {
               ),
               child: Text(
                 'Next',
-                style: textStyles.blackMainTextStyle,
+                style: tS.black36TS,
               ),
             ),
           ],
@@ -198,7 +200,7 @@ class DumbellPage extends StatelessWidget {
               ),
               child: Text(
                 'Take care of yourself',
-                style: textStyles.mainTextStyle,
+                style: tS.main36TS,
               ),
             ),
             TextButton(
@@ -214,7 +216,7 @@ class DumbellPage extends StatelessWidget {
               ),
               child: Text(
                 'Start',
-                style: textStyles.blackMainTextStyle,
+                style: tS.black36TS,
               ),
             ),
           ],
@@ -247,7 +249,7 @@ class BottomAttentionSheet extends StatelessWidget {
               ),
               Text(
                 'Attention',
-                style: textStyles.mainTextStyle,
+                style: tS.main36TS,
               ),
               GestureDetector(
                 onTap: () {
@@ -285,7 +287,7 @@ class BottomAttentionSheet extends StatelessWidget {
               ),
               child: Text(
                 'Start',
-                style: textStyles.mainTextStyle,
+                style: tS.main36TS,
               ),
             ),
           ),

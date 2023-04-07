@@ -13,22 +13,43 @@ class AppColors {
 final colors = AppColors();
 
 class AppTextStyles {
-  final TextStyle mainTextStyle = const TextStyle(
-    color: Color(0xff2C324A),
+  final TextStyle main36TS = TextStyle(
+    color: colors.mainColor,
     fontSize: 36,
   );
 
-  final TextStyle blackMainTextStyle = const TextStyle(
+  final TextStyle black36TS = const TextStyle(
     color: Colors.black,
     fontSize: 36,
   );
+  final TextStyle main32TS = TextStyle(
+    color: colors.mainColor,
+    fontSize: 32,
+  );
+  final TextStyle grey20TS1 = TextStyle(
+    fontSize: 20,
+    color: colors.greyColor,
+    height: 1,
+  );
+  final TextStyle main20TS = TextStyle(
+    fontSize: 20,
+    color: colors.mainColor,
+  );
+  final TextStyle grey16TS1 = TextStyle(
+    fontSize: 16,
+    color: colors.greyColor,
+    height: 1,
+  );
 }
 
-final textStyles = AppTextStyles();
+final tS = AppTextStyles();
 
 class AppMetrix {
+  late MediaQueryData mediaQueryData;
   late double screenHeight;
   late double screenWidth;
+  late double statusBarHeight;
+  late double bottomNavBarHeight;
 }
 
 final metrix = AppMetrix();
@@ -43,8 +64,9 @@ final longString = AppLongStrings();
 class AppIconsPaths {
   final String closeSvg = 'lib/assets/svg/close.svg';
   final String awardSvg = 'lib/assets/svg/award.svg';
-  final String grapsSvg = 'lib/assets/svg/graphs.svg';
+  final String graphsSvg = 'lib/assets/svg/graphs.svg';
   final String calendarSvg = 'lib/assets/svg/calendar.svg';
+  final String backArrow = 'lib/assets/svg/back_arrow.svg';
 }
 
 final ipath = AppIconsPaths();

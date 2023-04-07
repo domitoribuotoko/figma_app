@@ -1,13 +1,17 @@
 import 'dart:math';
 
 import 'package:figma_app/base/app_widgets.dart';
+import 'package:figma_app/screens/home_screen_pages/calculate_page.dart';
 import 'package:flutter/material.dart';
 
 import '../../base/app_constans.dart';
 import '../../base/app_methods.dart';
 
-late TabController _tabController;
-int _tabIndex = 0;
+late TabController graphPageTabController;
+ValueNotifier<int> tabGraphPageIndex = ValueNotifier<int>(0);
+double _tabBarViewPortHeight = 0;
+double _tabBarScrollHeight = 0;
+final ValueNotifier<bool> _isScrollabe = ValueNotifier<bool>(true);
 
 class GraphsPage extends StatefulWidget {
   const GraphsPage({super.key});
@@ -17,23 +21,20 @@ class GraphsPage extends StatefulWidget {
 }
 
 class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateMixin {
-  double _tabBarViewPortHeight = 0;
-  double _tabBarScrollHeight = 0;
-  late final ValueNotifier<bool> _isScrollabe = ValueNotifier<bool>(true);
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(
+    graphPageTabController = TabController(
       length: 2,
       vsync: this,
-      initialIndex: _tabIndex,
+      initialIndex: tabGraphPageIndex.value,
     );
   }
 
   @override
   void dispose() {
     super.dispose();
-    _tabController.dispose();
+    graphPageTabController.dispose();
   }
 
   @override
@@ -70,7 +71,7 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
             );
             return TabBarView(
               physics: const NeverScrollableScrollPhysics(),
-              controller: _tabController,
+              controller: graphPageTabController,
               children: <Widget>[
                 CustomScrollView(
                   slivers: [
@@ -115,8 +116,8 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
                           );
                           return Column(
                             children: List<Widget>.generate(
-                              2,
-                              (index) => _fatTabContainer(),
+                              4,
+                              (index) => _fatTabContainer(index),
                             ),
                           );
                         },
@@ -142,19 +143,11 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
             children: [
               Text(
                 '02.03.2023',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: colors.greyColor,
-                  height: 1,
-                ),
+                style: tS.grey16TS1,
               ),
               Text(
                 '1067 kcal',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: colors.greyColor,
-                  height: 1,
-                ),
+                style: tS.grey16TS1,
               ),
             ],
           ),
@@ -183,11 +176,7 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
                     ),
                     Text(
                       '2394 kcal',
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: colors.greyColor,
-                        height: 1,
-                      ),
+                      style: tS.grey20TS1,
                     ),
                   ],
                 ),
@@ -203,11 +192,7 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
                     ),
                     Text(
                       '-1327 kcal',
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: colors.greyColor,
-                        height: 1,
-                      ),
+                      style: tS.grey20TS1,
                     ),
                   ],
                 ),
@@ -219,9 +204,9 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
     );
   }
 
-  Widget _fatTabContainer() {
+  Widget _fatTabContainer(int index) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
+      padding: EdgeInsets.only(bottom: index == 3 ? 0 : 20),
       child: Column(
         children: [
           Row(
@@ -229,11 +214,7 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
             children: [
               Text(
                 '02.03.2023',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: colors.greyColor,
-                  height: 1,
-                ),
+                style: tS.grey16TS1,
               ),
             ],
           ),
@@ -288,6 +269,15 @@ class DashboardHeaderPersistentDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) {
+        _tabBarViewPortHeight = metrix.screenHeight -
+            context.findRenderObject()!.paintBounds.height -
+            metrix.bottomNavBarHeight -
+            metrix.statusBarHeight;
+        _isScrollabe.value = _tabBarScrollHeight > _tabBarViewPortHeight;
+      },
+    );
     double shrinkPercentage =
         isScrollable ? min(1, shrinkOffset / (maxExtent - minExtent)) : min(1, shrinkOffset / (maxExtent - 200));
     currentSize = isScrollable
@@ -298,6 +288,7 @@ class DashboardHeaderPersistentDelegate extends SliverPersistentHeaderDelegate {
 
     return Container(
       decoration: BoxDecoration(
+        // color: Colors.red,
         gradient: LinearGradient(
           begin: Alignment.bottomCenter - const Alignment(0, 0.1),
           end: Alignment.bottomCenter,
@@ -329,7 +320,7 @@ class DashboardHeaderPersistentDelegate extends SliverPersistentHeaderDelegate {
               ),
             ),
             child: Row(
-              mainAxisSize: MainAxisSize.max,
+              // mainAxisSize: MainAxisSize.max,
               children: [
                 _topContainer(
                   'Calories',
@@ -370,7 +361,15 @@ class DashboardHeaderPersistentDelegate extends SliverPersistentHeaderDelegate {
                         ),
                       ),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return const CalculatePage();
+                              },
+                            ),
+                          );
+                        },
                         style: TextButton.styleFrom(
                           backgroundColor: colors.redColor,
                           foregroundColor: Colors.white,
@@ -394,34 +393,39 @@ class DashboardHeaderPersistentDelegate extends SliverPersistentHeaderDelegate {
                   padding: EdgeInsets.only(
                     top: 10 + (20 * (1 - shrinkPercentage)),
                   ),
-                  child: Row(
-                    children: [
-                      _tabButton(
-                        ontap: () {
-                          _tabController.animateTo(
-                            0,
-                          );
-                          _tabIndex = 0;
-                        },
-                        buttonColor: _tabIndex == 0 ? colors.mainColor : Colors.white,
-                        text: 'Calories',
-                        textColor: _tabIndex != 0 ? colors.mainColor : Colors.white,
-                      ),
-                      SizedBox(
-                        width: method.hSizeCalc(20),
-                      ),
-                      _tabButton(
-                        ontap: () {
-                          _tabController.animateTo(
-                            1,
-                          );
-                          _tabIndex = 1;
-                        },
-                        buttonColor: _tabIndex == 1 ? colors.mainColor : Colors.white,
-                        text: 'Fat',
-                        textColor: _tabIndex != 1 ? colors.mainColor : Colors.white,
-                      ),
-                    ],
+                  child: ValueListenableBuilder(
+                    valueListenable: tabGraphPageIndex,
+                    builder: (context, value, widget) {
+                      return Row(
+                        children: [
+                          tabButton(
+                            ontap: () {
+                              graphPageTabController.animateTo(
+                                0,
+                              );
+                              tabGraphPageIndex.value = 0;
+                            },
+                            buttonColor: tabGraphPageIndex.value == 0 ? colors.mainColor : Colors.white,
+                            text: 'Calories',
+                            textColor: tabGraphPageIndex.value != 0 ? colors.mainColor : Colors.white,
+                          ),
+                          SizedBox(
+                            width: method.hSizeCalc(20),
+                          ),
+                          tabButton(
+                            ontap: () {
+                              graphPageTabController.animateTo(
+                                1,
+                              );
+                              tabGraphPageIndex.value = 1;
+                            },
+                            buttonColor: tabGraphPageIndex.value == 1 ? colors.mainColor : Colors.white,
+                            text: 'Fat',
+                            textColor: tabGraphPageIndex.value != 1 ? colors.mainColor : Colors.white,
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ),
               ],
@@ -522,32 +526,6 @@ class DashboardHeaderPersistentDelegate extends SliverPersistentHeaderDelegate {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _tabButton({
-    required Function() ontap,
-    required Color buttonColor,
-    required Color textColor,
-    required String text,
-  }) {
-    return TextButton(
-      onPressed: ontap,
-      style: TextButton.styleFrom(
-        backgroundColor: buttonColor,
-        foregroundColor: Colors.white.withOpacity(0.8),
-        minimumSize: Size(method.hSizeCalc(165), 41),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 20,
-          color: textColor,
-        ),
-      ),
     );
   }
 

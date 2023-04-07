@@ -16,33 +16,36 @@ class HomeScreenController extends StatefulWidget {
 class _HomeScreenControllerState extends State<HomeScreenController> {
   final PageController _pageController = PageController(initialPage: 1);
   final ValueNotifier<int> _activePage = ValueNotifier<int>(1);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: colors.mainBackgrounColor,
-      body: PageView.builder(
-        physics: const NeverScrollableScrollPhysics(),
-        controller: _pageController,
-        itemCount: 3,
-        onPageChanged: (value) {
-          _activePage.value = value;
-        },
-        itemBuilder: (context, index) {
-          return [
-            SafeArea(
-              child: Container(),
-            ),
-            const SafeArea(child: GraphsPage()),
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 5),
-              child: SafeArea(
-                child: Center(
-                  child: cartesianChart(5),
+      body: SafeArea(
+        child: PageView.builder(
+          physics: const NeverScrollableScrollPhysics(),
+          controller: _pageController,
+          itemCount: 3,
+          onPageChanged: (value) {
+            _activePage.value = value;
+          },
+          itemBuilder: (context, index) {
+            return [
+              SafeArea(
+                child: Container(),
+              ),
+              const GraphsPage(),
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 5),
+                child: SafeArea(
+                  child: Center(
+                    child: cartesianChart(5),
+                  ),
                 ),
               ),
-            ),
-          ].elementAt(index);
-        },
+            ].elementAt(index);
+          },
+        ),
       ),
       bottomNavigationBar: ValueListenableBuilder(
         valueListenable: _activePage,
@@ -55,8 +58,12 @@ class _HomeScreenControllerState extends State<HomeScreenController> {
             child: BottomNavigationBar(
               showSelectedLabels: false,
               showUnselectedLabels: false,
+              selectedLabelStyle: const TextStyle(
+                height: 1,
+                fontSize: 14,
+              ),
               currentIndex: _activePage.value,
-              iconSize: 0,
+              // iconSize: 0,
               backgroundColor: Colors.transparent,
               elevation: 0,
               onTap: (value) {
@@ -68,7 +75,7 @@ class _HomeScreenControllerState extends State<HomeScreenController> {
               },
               items: [
                 bottomBarItem(ipath.awardSvg),
-                bottomBarItem(ipath.grapsSvg),
+                bottomBarItem(ipath.graphsSvg),
                 bottomBarItem(ipath.calendarSvg),
               ],
             ),
@@ -82,12 +89,28 @@ class _HomeScreenControllerState extends State<HomeScreenController> {
 BottomNavigationBarItem bottomBarItem(String svg) {
   return BottomNavigationBarItem(
     label: '',
-    icon: SvgPicture.asset(
-      svg,
+    icon: Container(
+      padding: EdgeInsets.symmetric(
+        vertical: method.vSizeCalc(15),
+        horizontal: method.hSizeCalc(15),
+      ),
+      decoration: BoxDecoration(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: SvgPicture.asset(
+        svg,
+      ),
     ),
     activeIcon: Container(
-      padding: EdgeInsets.symmetric(vertical: method.vSizeCalc(15), horizontal: method.hSizeCalc(15)),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
+      padding: EdgeInsets.symmetric(
+        vertical: method.vSizeCalc(15),
+        horizontal: method.hSizeCalc(15),
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+      ),
       child: SvgPicture.asset(
         svg,
       ),
