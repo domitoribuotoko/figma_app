@@ -8,6 +8,7 @@ class AppColors {
   final Color circularGradientEnd = const Color(0xffFFA800);
   final Color cartesianGradient = const Color(0xff547AFF);
   final Color greyColor = const Color(0xff4E4E4E);
+  final Color lightGreyColor = const Color(0xffD1CDCD);
 }
 
 final colors = AppColors();
@@ -67,6 +68,9 @@ class AppIconsPaths {
   final String graphsSvg = 'lib/assets/svg/graphs.svg';
   final String calendarSvg = 'lib/assets/svg/calendar.svg';
   final String backArrow = 'lib/assets/svg/back_arrow.svg';
+  final String checkMark = 'lib/assets/svg/check.svg';
+  final String uncheckMark = 'lib/assets/svg/uncheck.svg';
+  final String fireIcon = 'lib/assets/svg/fire.svg';
 }
 
 final ipath = AppIconsPaths();

@@ -1,11 +1,14 @@
 import 'dart:math';
 
+import 'package:figma_app/base/app_classes.dart';
+import 'package:figma_app/base/app_config.dart';
+import 'package:figma_app/base/app_constans.dart';
+import 'package:figma_app/base/app_methods.dart';
 import 'package:figma_app/base/app_widgets.dart';
-import 'package:figma_app/screens/home_screen_pages/calculate_page.dart';
+import 'package:figma_app/screens/home_screen_pages/grapsh_pages/calculate_page.dart';
+import 'package:figma_app/screens/home_screen_pages/grapsh_pages/calories_details.dart';
 import 'package:flutter/material.dart';
-
-import '../../base/app_constans.dart';
-import '../../base/app_methods.dart';
+import 'package:intl/intl.dart';
 
 late TabController graphPageTabController;
 ValueNotifier<int> tabGraphPageIndex = ValueNotifier<int>(0);
@@ -89,11 +92,22 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
                           );
                           return Column(
                             children: List<Widget>.generate(
-                              6,
+                              config.box.value.length,
                               (index) {
-                                return _caloriesTabContainer();
+                                if (config.box.value.isEmpty) {
+                                  return const Text('no data');
+                                }
+                                if (index == config.box.value.length - 1) {
+                                  return ValueListenableBuilder(
+                                    valueListenable: config.box,
+                                    builder: (context, value, child) {
+                                      return _caloriesTabContainer(index);
+                                    },
+                                  );
+                                }
+                                return _caloriesTabContainer(index);
                               },
-                            ),
+                            ).reversed.toList(),
                           );
                         },
                       ),
@@ -116,9 +130,22 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
                           );
                           return Column(
                             children: List<Widget>.generate(
-                              4,
-                              (index) => _fatTabContainer(index),
-                            ),
+                              config.box.value.length,
+                              (index) {
+                                if (config.box.value.isEmpty) {
+                                  return const Text('no data');
+                                }
+                                if (index == config.box.value.length - 1) {
+                                  return ValueListenableBuilder(
+                                    valueListenable: config.box,
+                                    builder: (context, value, child) {
+                                      return _fatTabContainer(index);
+                                    },
+                                  );
+                                }
+                                return _fatTabContainer(index);
+                              },
+                            ).reversed.toList(),
                           );
                         },
                       ),
@@ -133,87 +160,144 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
     );
   }
 
-  Widget _caloriesTabContainer() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '02.03.2023',
-                style: tS.grey16TS1,
-              ),
-              Text(
-                '1067 kcal',
-                style: tS.grey16TS1,
-              ),
-            ],
+  Widget _caloriesTabContainer(int index) {
+    var item = config.box.value.getAt(index);
+    var foodSumm = 0;
+    var expendSumm = 0;
+    for (Map<String, int> element in item!.food) {
+      foodSumm = foodSumm + element.values.first;
+    }
+    for (Map<String, int> element in item.expenditure) {
+      expendSumm = expendSumm + element.values.first;
+    }
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) {
+              return const CaloriesDetails();
+            },
           ),
-          Container(
-            height: 92,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20,
-              vertical: 15,
-            ),
-            child: Column(
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.only(top: 20),
+        child: Column(
+          children: [
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Food',
-                      style: TextStyle(
-                        fontSize: 20,
-                        height: 1,
-                      ),
-                    ),
-                    Text(
-                      '2394 kcal',
-                      style: tS.grey20TS1,
-                    ),
-                  ],
+                Text(
+                  DateFormat('dd.MM.y').format(item.date),
+                  style: tS.grey16TS1,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Expenditure',
-                      style: TextStyle(
-                        fontSize: 20,
-                        height: 1,
-                      ),
-                    ),
-                    Text(
-                      '-1327 kcal',
-                      style: tS.grey20TS1,
-                    ),
-                  ],
+                Text(
+                  '${(foodSumm - expendSumm)} kcal',
+                  style: tS.grey16TS1,
                 ),
               ],
             ),
-          )
-        ],
+            Container(
+              height: 92,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 15,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Food',
+                        style: TextStyle(
+                          fontSize: 20,
+                          height: 1,
+                        ),
+                      ),
+                      Text(
+                        '$foodSumm kcal',
+                        style: tS.grey20TS1,
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Expenditure',
+                        style: TextStyle(
+                          fontSize: 20,
+                          height: 1,
+                        ),
+                      ),
+                      Text(
+                        '-$expendSumm  kcal',
+                        style: tS.grey20TS1,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
 
   Widget _fatTabContainer(int index) {
+    var f = NumberFormat("###.##");
+    var item = config.box.value.getAt(index);
+    late AppDaylyData? itemBefore;
+    late double fatBefore;
+    late double difference;
+    var fatPercent = item!.fat?.bodyFatPercentage;
+
+    if (index > 0) {
+      itemBefore = config.box.value.getAt(index - 1);
+      fatBefore = itemBefore!.fat!.bodyFatPercentage;
+      difference = fatPercent! - fatBefore;
+    }
+
+    String getFatValue() {
+      if (index == 0) {
+        return f.format(fatPercent);
+      } else {
+        if (difference > 0) {
+          return '+${f.format(difference)}';
+        } else {
+          return f.format(difference);
+        }
+      }
+    }
+
+    String getFatString() {
+      if (index == 0) {
+        return 'fat. %';
+      } else {
+        if (difference > 0) {
+          return '+fat. %';
+        } else {
+          return '-fat. %';
+        }
+      }
+    }
+
     return Padding(
-      padding: EdgeInsets.only(bottom: index == 3 ? 0 : 20),
+      padding: const EdgeInsets.only(top: 20),
       child: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Text(
-                '02.03.2023',
+                DateFormat('dd.MM.y').format(item.date),
                 style: tS.grey16TS1,
               ),
             ],
@@ -231,26 +315,37 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      '-fat. %',
-                      style: TextStyle(
-                        fontSize: 20,
-                        height: 1.05,
+                fatPercent != null
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            getFatString(),
+                            style: const TextStyle(
+                              fontSize: 20,
+                              height: 1.05,
+                            ),
+                          ),
+                          Text(
+                            ' ${getFatValue()} %',
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: colors.greyColor,
+                              height: 1.05,
+                            ),
+                          ),
+                        ],
+                      )
+                    : Center(
+                        child: Text(
+                          'No this day fat data',
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: colors.greyColor,
+                            height: 1.05,
+                          ),
+                        ),
                       ),
-                    ),
-                    Text(
-                      '-0,5 % %',
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: colors.greyColor,
-                        height: 1.05,
-                      ),
-                    ),
-                  ],
-                ),
               ],
             ),
           )
@@ -322,11 +417,36 @@ class DashboardHeaderPersistentDelegate extends SliverPersistentHeaderDelegate {
             child: Row(
               // mainAxisSize: MainAxisSize.max,
               children: [
-                _topContainer(
-                  'Calories',
-                  '1067 kcal',
-                  shrinkPercentage,
-                  circularChart(),
+                ValueListenableBuilder(
+                  valueListenable: config.box,
+                  builder: (context, value, _) {
+                    var item = config.box.value.get(method.dateToKey());
+                    double foodSumm = 0;
+                    double expendSumm = 0;
+                    for (Map<String, int> element in item!.food) {
+                      foodSumm = foodSumm + element.values.first;
+                    }
+                    for (Map<String, int> element in item.expenditure) {
+                      expendSumm = expendSumm + element.values.first;
+                    }
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return const CaloriesDetails();
+                            },
+                          ),
+                        );
+                      },
+                      child: _topContainer(
+                        'Calories',
+                        '${(foodSumm - expendSumm).toInt()} kcal',
+                        shrinkPercentage,
+                        circularChart(foodSumm, expendSumm,'60%'),
+                      ),
+                    );
+                  },
                 ),
                 SizedBox(
                   width: method.hSizeCalc(20),

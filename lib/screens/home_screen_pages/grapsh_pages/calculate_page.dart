@@ -1,10 +1,11 @@
+import 'package:figma_app/base/app_classes.dart';
+import 'package:figma_app/base/app_config.dart';
 import 'package:figma_app/base/app_constans.dart';
+import 'package:figma_app/base/app_methods.dart';
+import 'package:figma_app/base/app_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
-
-import '../../base/app_methods.dart';
-import '../../base/app_widgets.dart';
 
 class CalculatePage extends StatefulWidget {
   const CalculatePage({super.key});
@@ -13,7 +14,8 @@ class CalculatePage extends StatefulWidget {
   State<CalculatePage> createState() => _CalculatePageState();
 }
 
-ValueNotifier<bool> isSwitched = ValueNotifier(false);
+ValueNotifier<bool> fatSwitcher = ValueNotifier(true);
+ValueNotifier<bool> caloriesSwitcher = ValueNotifier(true);
 
 class _CalculatePageState extends State<CalculatePage> with SingleTickerProviderStateMixin {
   late final TabController _tabController = TabController(
@@ -113,22 +115,29 @@ class _CalculatePageState extends State<CalculatePage> with SingleTickerProvider
             top: method.vSizeCalc(30),
           ),
           child: TabBarView(
-            // physics: const NeverScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             controller: _tabController,
             children: [
-              CustomScrollView(
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: caloriesAdd(
-                      _formCaloriesKey,
-                      context,
+              Column(
+                children: [
+                  switcherDefault('calories'),
+                  Expanded(
+                    child: CustomScrollView(
+                      slivers: [
+                        SliverToBoxAdapter(
+                          child: caloriesAdd(
+                            _formCaloriesKey,
+                            context,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
               Column(
                 children: [
-                  switcher(),
+                  switcherDefault('fat'),
                   Expanded(
                     child: CustomScrollView(
                       shrinkWrap: true,
@@ -153,42 +162,67 @@ class _CalculatePageState extends State<CalculatePage> with SingleTickerProvider
 }
 
 Widget caloriesAdd(GlobalKey<FormState> formKey, BuildContext context) {
-  return Form(
-    key: formKey,
-    child: Column(
-      children: [
-        formField(
-          fieldName: 'Food',
-          hintText: 'Product name',
-          onSaved: (newValue) {},
-          validator: (String? value) {
-            if (value == null || value.isEmpty) {
-              return '';
-            }
-            return null;
-          },
+  late Map<String, int> addedMap;
+  late String name;
+  late int calories;
+  return ValueListenableBuilder(
+    valueListenable: caloriesSwitcher,
+    builder: (context, value, _) {
+      return Form(
+        key: formKey,
+        child: Column(
+          children: [
+            formField(
+              fieldName: caloriesSwitcher.value ? 'Food' : 'Expenditure',
+              hintText: caloriesSwitcher.value ? 'Product name' : 'Expenditure Name',
+              onSaved: (newValue) {
+                name = newValue!.trim();
+              },
+              validator: (String? value) {
+                if (value == null || value.isEmpty) {
+                  return '';
+                }
+                return null;
+              },
+            ),
+            formField(
+              fieldName: 'Number of calories',
+              onSaved: (newValue) {
+                calories = int.parse(newValue!.trim());
+              },
+              validator: (String? value) {
+                if (value == null || value.isEmpty) {
+                  return '';
+                }
+                return null;
+              },
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            ),
+            addButton(
+              formKey,
+              context,
+              () {
+                if (caloriesSwitcher.value) {
+                  addedMap = {name: calories};
+                  var data = config.box.value.get(method.dateToKey())!..food.add(addedMap);
+                  data.save();
+                } else {
+                  addedMap = {name: calories};
+                  var data = config.box.value.get(method.dateToKey())!..expenditure.add(addedMap);
+                  data.save();
+                }
+                config.box.notifyListeners();
+              },
+            ),
+          ],
         ),
-        formField(
-          fieldName: 'Number of calories',
-          onSaved: (newValue) {},
-          validator: (String? value) {
-            if (value == null || value.isEmpty) {
-              return '';
-            }
-            return null;
-          },
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        ),
-        addButton(
-          formKey,
-          context,
-        ),
-      ],
-    ),
+      );
+    },
   );
 }
 
 Widget fatAdd(GlobalKey<FormState> formKey, BuildContext context) {
+  Map<String, double> measures = {};
   List<String> formNames = [
     'Height',
     'Weight',
@@ -205,7 +239,8 @@ Widget fatAdd(GlobalKey<FormState> formKey, BuildContext context) {
             (index) => formField(
               fieldName: formNames[index],
               onSaved: (newValue) {
-                print(newValue);
+                measures.addAll({formNames[index]: double.parse(newValue!)});
+                // print(newValue);
               },
               validator: (String? value) {
                 if (value == null || value.isEmpty) {
@@ -218,14 +253,15 @@ Widget fatAdd(GlobalKey<FormState> formKey, BuildContext context) {
           )
             ..add(
               ValueListenableBuilder(
-                valueListenable: isSwitched,
+                valueListenable: fatSwitcher,
                 builder: (context, value, _) {
                   return Visibility(
-                    visible: !isSwitched.value,
+                    visible: !fatSwitcher.value,
                     child: formField(
                       fieldName: 'Hip girth',
                       onSaved: (newValue) {
-                        print(newValue);
+                        measures.addAll({'Hip girth': double.parse(newValue!)});
+                        // print(newValue);
                       },
                       validator: (String? value) {
                         if (value == null || value.isEmpty) {
@@ -243,6 +279,31 @@ Widget fatAdd(GlobalKey<FormState> formKey, BuildContext context) {
               addButton(
                 formKey,
                 context,
+                () {
+                  List calulates = method.calculateFats(
+                    fatSwitcher.value ? 'male' : 'female',
+                    measures['Height']!,
+                    measures['Weight']!,
+                    measures['Neck girth']!,
+                    measures['Waist circumference']!,
+                    measures['Hip girth'],
+                  );
+                  if (calulates[0] < 0 || calulates[0] > 100) {
+                    showSnackAlert(context, 'Invalid data entered');
+                    return 'invalid data';
+                  } else {
+                    Fat calculatedFat = Fat(
+                      calulates[0],
+                      calulates[1],
+                      calulates[2],
+                      calulates[3],
+                    );
+                    var data = config.box.value.get(method.dateToKey())!..fat = calculatedFat;
+                    data.save();
+                    config.box.notifyListeners();
+                    return 'saved';
+                  }
+                },
               ),
             ),
         ),
@@ -251,11 +312,11 @@ Widget fatAdd(GlobalKey<FormState> formKey, BuildContext context) {
   );
 }
 
-Widget switcher() {
+Widget switcherCustom() {
   return Padding(
     padding: EdgeInsets.only(bottom: method.vSizeCalc(30)),
     child: ValueListenableBuilder(
-      valueListenable: isSwitched,
+      valueListenable: fatSwitcher,
       builder: (context, value, _) {
         return ClipRRect(
           borderRadius: BorderRadius.circular(20),
@@ -266,11 +327,11 @@ Widget switcher() {
               2,
               (index) => GestureDetector(
                 onTap: () {
-                  index == 0 ? isSwitched.value = true : isSwitched.value = false;
+                  index == 0 ? fatSwitcher.value = true : fatSwitcher.value = false;
                 },
                 child: Container(
                   decoration: BoxDecoration(
-                    color: isSwitched.value
+                    color: fatSwitcher.value
                         ? index == 0
                             ? Colors.blue
                             : Colors.grey
@@ -287,7 +348,7 @@ Widget switcher() {
                       children: [
                         FittedBox(
                           child: Text(
-                            index == 1 ? 'Female' : 'Male',
+                            index == 0 ? 'Male' : 'Female',
                             style: const TextStyle(
                               fontSize: 20,
                               color: Colors.white,
@@ -311,7 +372,85 @@ Widget switcher() {
   );
 }
 
-Widget addButton(GlobalKey<FormState> formKey, BuildContext context) {
+Widget switcherDefault(String page) {
+  String setIcon(int index) {
+    if (page == 'fat') {
+      return fatSwitcher.value
+          ? index == 0
+              ? ipath.checkMark
+              : ipath.uncheckMark
+          : index == 1
+              ? ipath.checkMark
+              : ipath.uncheckMark;
+    } else {
+      return caloriesSwitcher.value
+          ? index == 0
+              ? ipath.checkMark
+              : ipath.uncheckMark
+          : index == 1
+              ? ipath.checkMark
+              : ipath.uncheckMark;
+    }
+  }
+
+  return Padding(
+    padding: EdgeInsets.only(
+      bottom: method.vSizeCalc(30),
+      left: method.hSizeCalc(40),
+      right: method.hSizeCalc(40),
+    ),
+    child: ValueListenableBuilder(
+      valueListenable: page == 'fat' ? fatSwitcher : caloriesSwitcher,
+      builder: (context, value, _) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: List<Widget>.generate(
+            2,
+            (index) => GestureDetector(
+              onTap: () {
+                if (page == 'fat') {
+                  index == 0 ? fatSwitcher.value = true : fatSwitcher.value = false;
+                } else {
+                  index == 0 ? caloriesSwitcher.value = true : caloriesSwitcher.value = false;
+                }
+              },
+              child: Container(
+                color: colors.mainBackgrounColor,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SvgPicture.asset(
+                      setIcon(index),
+                    ),
+                    SizedBox(
+                      width: method.hSizeCalc(20),
+                    ),
+                    FittedBox(
+                      child: Text(
+                        index == 0
+                            ? page == 'fat'
+                                ? 'Male'
+                                : 'Food'
+                            : page == 'fat'
+                                ? 'Female'
+                                : 'Expenditure',
+                        style: const TextStyle(
+                          fontSize: 20,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    ),
+  );
+}
+
+Widget addButton(GlobalKey<FormState> formKey, BuildContext context, Function() saveTostorage) {
   return Padding(
     padding: const EdgeInsets.only(
       bottom: 20,
@@ -320,9 +459,13 @@ Widget addButton(GlobalKey<FormState> formKey, BuildContext context) {
       onPressed: () {
         if (formKey.currentState!.validate()) {
           formKey.currentState!.save();
-          formKey.currentState!.reset();
+          if (saveTostorage() == 'invalid data') {
+            return;
+          } else {
+            formKey.currentState!.reset();
+          }
         } else {
-          showSnackAlert(context);
+          showSnackAlert(context, 'Fill in the fields');
         }
       },
       style: TextButton.styleFrom(
@@ -343,14 +486,14 @@ Widget addButton(GlobalKey<FormState> formKey, BuildContext context) {
   );
 }
 
-showSnackAlert(BuildContext context) {
+showSnackAlert(BuildContext context, String text) {
   ScaffoldMessenger.of(context)
       .showSnackBar(
         SnackBar(
           backgroundColor: colors.mainColor,
-          content: const Text(
-            'Fill in the fields',
-            style: TextStyle(
+          content: Text(
+            text,
+            style: const TextStyle(
               fontSize: 16,
             ),
           ),

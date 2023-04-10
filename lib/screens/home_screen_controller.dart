@@ -1,10 +1,11 @@
 import 'package:figma_app/base/app_constans.dart';
 import 'package:figma_app/base/app_widgets.dart';
-import 'package:figma_app/screens/home_screen_pages/graphs_page.dart';
+import 'package:figma_app/screens/test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '../base/app_methods.dart';
+import 'home_screen_pages/grapsh_pages/graphs_page.dart';
 
 class HomeScreenController extends StatefulWidget {
   const HomeScreenController({super.key});
@@ -31,8 +32,8 @@ class _HomeScreenControllerState extends State<HomeScreenController> {
           },
           itemBuilder: (context, index) {
             return [
-              SafeArea(
-                child: Container(),
+              const SafeArea(
+                child: TestPage(),
               ),
               const GraphsPage(),
               Container(

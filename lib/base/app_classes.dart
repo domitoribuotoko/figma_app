@@ -1,16 +1,41 @@
+import 'package:hive/hive.dart';
+
+part 'adapters.dart';
+
 class Value {
   String x;
-  int calories;
+  double calories;
   Value(
     this.x,
     this.calories,
   );
 }
 
-class Fat {
+@HiveType(typeId: 1)
+class AppDaylyData extends HiveObject {
+  @HiveField(0)
+  final DateTime date;
+  @HiveField(1)
+  List<Map<String, int>> food = [];
+  @HiveField(2)
+  List<Map<String, int>> expenditure = [];
+  @HiveField(3)
+  Fat? fat;
+  AppDaylyData({
+    required this.date,
+    this.fat,
+  });
+}
+
+@HiveType(typeId: 2)
+class Fat extends HiveObject{
+  @HiveField(0)
   double bodyFatPercentage;
+  @HiveField(1)
   double fatMass;
+  @HiveField(2)
   double massWithoutFat;
+  @HiveField(3)
   String category;
   Fat(
     this.bodyFatPercentage,
@@ -18,15 +43,4 @@ class Fat {
     this.massWithoutFat,
     this.category,
   );
-}
-
-class AppDaylyData {
-  final DateTime date;
-  List<Map<String, int>> food = [];
-  List<Map<String, int>> expenditure = [];
-  Fat? fat;
-  AppDaylyData({
-    required this.date,
-    this.fat,
-  });
 }

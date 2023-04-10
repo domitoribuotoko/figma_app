@@ -5,12 +5,11 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'app_classes.dart';
 import 'app_methods.dart';
 
-Widget circularChart() {
-  double maxValue = 2394;
+Widget circularChart(double maxValue, double expenditure,String innerRadius) {
   List<Value> data = [
     Value(
       '',
-      3000,
+      expenditure,
     ),
   ];
 
@@ -38,7 +37,8 @@ Widget circularChart() {
         yValueMapper: (Value data, _) => data.calories,
         maximumValue: data[0].calories.toDouble() > maxValue ? data[0].calories.toDouble() : maxValue,
         cornerStyle: setCurves(),
-        innerRadius: '60%',
+        innerRadius: innerRadius,
+        trackColor: colors.lightGreyColor,
       ),
     ],
   );

@@ -6,7 +6,8 @@ import 'base/app_methods.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await method.getPackageInfo();
+  // await method.getPackageInfo();
+  await method.getHiveList();
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
