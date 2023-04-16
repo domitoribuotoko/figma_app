@@ -1,11 +1,13 @@
+import 'package:figma_app/base/app_classes.dart';
 import 'package:figma_app/base/app_constans.dart';
-import 'package:figma_app/base/app_widgets.dart';
-import 'package:figma_app/screens/test.dart';
+import 'package:figma_app/screens/home_screen_pages/exercise_page.dart';
+import 'package:figma_app/screens/home_screen_pages/graphs_page.dart';
+import 'package:figma_app/screens/home_screen_pages/article_video_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../base/app_config.dart';
 import '../base/app_methods.dart';
-import 'home_screen_pages/grapsh_pages/graphs_page.dart';
 
 class HomeScreenController extends StatefulWidget {
   const HomeScreenController({super.key});
@@ -32,18 +34,9 @@ class _HomeScreenControllerState extends State<HomeScreenController> {
           },
           itemBuilder: (context, index) {
             return [
-              const SafeArea(
-                child: TestPage(),
-              ),
+              const ExercisePage(),
               const GraphsPage(),
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 5),
-                child: SafeArea(
-                  child: Center(
-                    child: cartesianChart(5),
-                  ),
-                ),
-              ),
+              const ArticlesVideosPage(),
             ].elementAt(index);
           },
         ),
@@ -84,6 +77,21 @@ class _HomeScreenControllerState extends State<HomeScreenController> {
         },
       ),
     );
+  }
+
+  List<FatData> getChartFatData() {
+    List<FatData> data = [];
+    for (var element in config.box.values) {
+      if (element.fat != null) {
+        data.add(
+          FatData(
+            element.fat!.bodyFatPercentage,
+            element.date,
+          ),
+        );
+      }
+    }
+    return data;
   }
 }
 

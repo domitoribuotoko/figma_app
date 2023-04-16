@@ -16,8 +16,9 @@ class CalculatePage extends StatefulWidget {
 
 ValueNotifier<bool> fatSwitcher = ValueNotifier(true);
 ValueNotifier<bool> caloriesSwitcher = ValueNotifier(true);
+final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
-class _CalculatePageState extends State<CalculatePage> with SingleTickerProviderStateMixin {
+class _CalculatePageState extends State<CalculatePage> with TickerProviderStateMixin {
   late final TabController _tabController = TabController(
     length: 2,
     vsync: this,
@@ -33,127 +34,112 @@ class _CalculatePageState extends State<CalculatePage> with SingleTickerProvider
   }
 
   @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-      child: Scaffold(
-        appBar: AppBar(
-          toolbarHeight: 92,
-          backgroundColor: colors.mainBackgrounColor,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: Container(
-                  height: 30,
-                  width: 30,
-                  // color: Colors.blue,
-                  margin: EdgeInsets.only(
-                    left: method.hSizeCalc(25),
-                    right: method.hSizeCalc(10),
-                  ),
-                  child: SvgPicture.asset(
-                    ipath.backArrow,
-                    fit: BoxFit.scaleDown,
+      child: WillPopScope(
+        onWillPop: () async {
+          ScaffoldMessenger.of(scaffoldKey.currentContext!).hideCurrentSnackBar();
+          return Future.value(true);
+        },
+        child: Scaffold(
+          key: scaffoldKey,
+          appBar: AppBar(
+            toolbarHeight: 92,
+            backgroundColor: colors.mainBackgrounColor,
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                GestureDetector(
+                  onTap: () async {
+                    Navigator.of(scaffoldKey.currentContext!).pop();
+                    ScaffoldMessenger.of(scaffoldKey.currentContext!).hideCurrentSnackBar();
+                  },
+                  child: Container(
+                    height: 30,
+                    width: 30,
+                    // color: Colors.blue,
+                    margin: EdgeInsets.only(
+                      left: method.hSizeCalc(25),
+                      right: method.hSizeCalc(10),
+                    ),
+                    child: SvgPicture.asset(
+                      ipath.backArrow,
+                      fit: BoxFit.scaleDown,
+                    ),
                   ),
                 ),
+                Text(
+                  'Calculate',
+                  style: tS.main32TS,
+                ),
+              ],
+            ),
+            elevation: 0,
+            titleSpacing: 0,
+            automaticallyImplyLeading: false,
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(41),
+              child: ValueListenableBuilder(
+                valueListenable: _tabIndex,
+                builder: (context, value, widget) {
+                  return customTabBar('Calories','Fat',_tabController, _tabIndex);
+                },
               ),
-              Text(
-                'Calculate',
-                style: tS.main32TS,
-              ),
-            ],
-          ),
-          elevation: 0,
-          titleSpacing: 0,
-          automaticallyImplyLeading: false,
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(41),
-            child: ValueListenableBuilder(
-              valueListenable: _tabIndex,
-              builder: (context, value, widget) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    tabButton(
-                      ontap: () {
-                        _tabController.animateTo(
-                          0,
-                        );
-                        _tabIndex.value = 0;
-                      },
-                      buttonColor: _tabIndex.value == 0 ? colors.mainColor : Colors.white,
-                      text: 'Calories',
-                      textColor: _tabIndex.value != 0 ? colors.mainColor : Colors.white,
-                    ),
-                    SizedBox(
-                      width: method.hSizeCalc(20),
-                    ),
-                    tabButton(
-                      ontap: () {
-                        _tabController.animateTo(
-                          1,
-                        );
-                        _tabIndex.value = 1;
-                      },
-                      buttonColor: _tabIndex.value == 1 ? colors.mainColor : Colors.white,
-                      text: 'Fat',
-                      textColor: _tabIndex.value != 1 ? colors.mainColor : Colors.white,
-                    ),
-                  ],
-                );
-              },
             ),
           ),
-        ),
-        backgroundColor: colors.mainBackgrounColor,
-        body: Padding(
-          padding: EdgeInsets.only(
-            top: method.vSizeCalc(30),
-          ),
-          child: TabBarView(
-            physics: const NeverScrollableScrollPhysics(),
-            controller: _tabController,
-            children: [
-              Column(
-                children: [
-                  switcherDefault('calories'),
-                  Expanded(
-                    child: CustomScrollView(
-                      slivers: [
-                        SliverToBoxAdapter(
-                          child: caloriesAdd(
-                            _formCaloriesKey,
-                            context,
+          backgroundColor: colors.mainBackgrounColor,
+          body: Padding(
+            padding: EdgeInsets.only(
+              top: method.vSizeCalc(30),
+            ),
+            child: TabBarView(
+              physics: const NeverScrollableScrollPhysics(),
+              controller: _tabController,
+              children: [
+                Column(
+                  children: [
+                    switcherDefault('calories'),
+                    Expanded(
+                      child: CustomScrollView(
+                        slivers: [
+                          SliverToBoxAdapter(
+                            child: caloriesAdd(
+                              _formCaloriesKey,
+                              context,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              Column(
-                children: [
-                  switcherDefault('fat'),
-                  Expanded(
-                    child: CustomScrollView(
-                      shrinkWrap: true,
-                      slivers: [
-                        SliverToBoxAdapter(
-                          child: fatAdd(
-                            _formFatKey,
-                            context,
+                  ],
+                ),
+                Column(
+                  children: [
+                    switcherDefault('fat'),
+                    Expanded(
+                      child: CustomScrollView(
+                        shrinkWrap: true,
+                        slivers: [
+                          SliverToBoxAdapter(
+                            child: fatAdd(
+                              _formFatKey,
+                              context,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -184,6 +170,7 @@ Widget caloriesAdd(GlobalKey<FormState> formKey, BuildContext context) {
                 }
                 return null;
               },
+              type: '',
             ),
             formField(
               fieldName: 'Number of calories',
@@ -197,6 +184,7 @@ Widget caloriesAdd(GlobalKey<FormState> formKey, BuildContext context) {
                 return null;
               },
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              type: 'kcal',
             ),
             addButton(
               formKey,
@@ -204,14 +192,16 @@ Widget caloriesAdd(GlobalKey<FormState> formKey, BuildContext context) {
               () {
                 if (caloriesSwitcher.value) {
                   addedMap = {name: calories};
-                  var data = config.box.value.get(method.dateToKey())!..food.add(addedMap);
+                  var data = config.box.get(method.dateToKey())!..food.add(addedMap);
                   data.save();
+                  config.daylyData.value = DateTime.now().toString();
                 } else {
                   addedMap = {name: calories};
-                  var data = config.box.value.get(method.dateToKey())!..expenditure.add(addedMap);
+                  var data = config.box.get(method.dateToKey())!..expenditure.add(addedMap);
                   data.save();
+                  config.daylyData.value = DateTime.now().toString();
                 }
-                config.box.notifyListeners();
+                return 'saved';
               },
             ),
           ],
@@ -249,6 +239,7 @@ Widget fatAdd(GlobalKey<FormState> formKey, BuildContext context) {
                 return null;
               },
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              type: index == 1 ? 'kg' : 'cm',
             ),
           )
             ..add(
@@ -280,7 +271,7 @@ Widget fatAdd(GlobalKey<FormState> formKey, BuildContext context) {
                 formKey,
                 context,
                 () {
-                  List calulates = method.calculateFats(
+                  List calculates = method.calculateFats(
                     fatSwitcher.value ? 'male' : 'female',
                     measures['Height']!,
                     measures['Weight']!,
@@ -288,19 +279,18 @@ Widget fatAdd(GlobalKey<FormState> formKey, BuildContext context) {
                     measures['Waist circumference']!,
                     measures['Hip girth'],
                   );
-                  if (calulates[0] < 0 || calulates[0] > 100) {
-                    showSnackAlert(context, 'Invalid data entered');
+                  if (calculates[0] < 0 || calculates[0] > 100 || calculates[0].toString() == 'NaN') {
                     return 'invalid data';
                   } else {
                     Fat calculatedFat = Fat(
-                      calulates[0],
-                      calulates[1],
-                      calulates[2],
-                      calulates[3],
+                      calculates[0],
+                      calculates[1],
+                      calculates[2],
+                      calculates[3],
                     );
-                    var data = config.box.value.get(method.dateToKey())!..fat = calculatedFat;
+                    var data = config.box.get(method.dateToKey())!..fat = calculatedFat;
                     data.save();
-                    config.box.notifyListeners();
+                    config.daylyData.value = DateTime.now().toString();
                     return 'saved';
                   }
                 },
@@ -459,13 +449,16 @@ Widget addButton(GlobalKey<FormState> formKey, BuildContext context, Function() 
       onPressed: () {
         if (formKey.currentState!.validate()) {
           formKey.currentState!.save();
-          if (saveTostorage() == 'invalid data') {
+          String result = saveTostorage();
+          if (result == 'invalid data') {
+            showSnackAlert('Invalid data entered');
             return;
           } else {
+            showSnackAlert('Added');
             formKey.currentState!.reset();
           }
         } else {
-          showSnackAlert(context, 'Fill in the fields');
+          showSnackAlert('Fill in the fields');
         }
       },
       style: TextButton.styleFrom(
@@ -486,10 +479,13 @@ Widget addButton(GlobalKey<FormState> formKey, BuildContext context, Function() 
   );
 }
 
-showSnackAlert(BuildContext context, String text) {
-  ScaffoldMessenger.of(context)
+showSnackAlert(
+  String text,
+) {
+  ScaffoldMessenger.of(scaffoldKey.currentContext!)
       .showSnackBar(
         SnackBar(
+          behavior: SnackBarBehavior.floating,
           backgroundColor: colors.mainColor,
           content: Text(
             text,
@@ -497,13 +493,13 @@ showSnackAlert(BuildContext context, String text) {
               fontSize: 16,
             ),
           ),
-          duration: const Duration(milliseconds: 1000),
+          duration: const Duration(milliseconds: 800),
         ),
       )
       .closed
       .then(
     (value) {
-      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(scaffoldKey.currentContext!).clearSnackBars();
     },
   );
 }

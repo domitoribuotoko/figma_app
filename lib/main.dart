@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:figma_app/screens/start_pages_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import 'base/app_methods.dart';
 
@@ -8,6 +11,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // await method.getPackageInfo();
   await method.getHiveList();
+  if (Platform.isAndroid) {
+    await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
+  }
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,

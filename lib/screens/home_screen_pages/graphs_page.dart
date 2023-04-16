@@ -7,6 +7,7 @@ import 'package:figma_app/base/app_methods.dart';
 import 'package:figma_app/base/app_widgets.dart';
 import 'package:figma_app/screens/home_screen_pages/grapsh_pages/calculate_page.dart';
 import 'package:figma_app/screens/home_screen_pages/grapsh_pages/calories_details.dart';
+import 'package:figma_app/screens/home_screen_pages/grapsh_pages/fat_details.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -92,14 +93,14 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
                           );
                           return Column(
                             children: List<Widget>.generate(
-                              config.box.value.length,
+                              config.box.length,
                               (index) {
-                                if (config.box.value.isEmpty) {
+                                if (config.box.isEmpty) {
                                   return const Text('no data');
                                 }
-                                if (index == config.box.value.length - 1) {
+                                if (index == config.box.length - 1) {
                                   return ValueListenableBuilder(
-                                    valueListenable: config.box,
+                                    valueListenable: config.daylyData,
                                     builder: (context, value, child) {
                                       return _caloriesTabContainer(index);
                                     },
@@ -130,14 +131,14 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
                           );
                           return Column(
                             children: List<Widget>.generate(
-                              config.box.value.length,
+                              config.box.length,
                               (index) {
-                                if (config.box.value.isEmpty) {
+                                if (config.box.isEmpty) {
                                   return const Text('no data');
                                 }
-                                if (index == config.box.value.length - 1) {
+                                if (index == config.box.length - 1) {
                                   return ValueListenableBuilder(
-                                    valueListenable: config.box,
+                                    valueListenable: config.daylyData,
                                     builder: (context, value, child) {
                                       return _fatTabContainer(index);
                                     },
@@ -161,7 +162,7 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
   }
 
   Widget _caloriesTabContainer(int index) {
-    var item = config.box.value.getAt(index);
+    var item = config.box.getAt(index);
     var foodSumm = 0;
     var expendSumm = 0;
     for (Map<String, int> element in item!.food) {
@@ -175,7 +176,9 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) {
-              return const CaloriesDetails();
+              return CaloriesDetails(
+                data: item,
+              );
             },
           ),
         );
@@ -252,27 +255,36 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
   }
 
   Widget _fatTabContainer(int index) {
-    var f = NumberFormat("###.##");
-    var item = config.box.value.getAt(index);
+    var item = config.box.getAt(index);
     late AppDaylyData? itemBefore;
-    late double fatBefore;
-    late double difference;
+    late double? fatBefore;
+    late double? difference;
     var fatPercent = item!.fat?.bodyFatPercentage;
 
-    if (index > 0) {
-      itemBefore = config.box.value.getAt(index - 1);
-      fatBefore = itemBefore!.fat!.bodyFatPercentage;
-      difference = fatPercent! - fatBefore;
+    if (index > 0 && fatPercent != null) {
+      for (var i = 1; i < config.box.length; i++) {
+        itemBefore = config.box.getAt(index - i);
+        fatBefore = itemBefore!.fat?.bodyFatPercentage;
+        if (fatBefore != null) {
+          i = config.box.length;
+        }
+      }
+      if (fatBefore == null) {
+      } else {
+        difference = fatPercent - fatBefore;
+      }
     }
 
     String getFatValue() {
       if (index == 0) {
-        return f.format(fatPercent);
+        return config.f.format(fatPercent);
       } else {
-        if (difference > 0) {
-          return '+${f.format(difference)}';
+        if (difference == null) {
+          return config.f.format(fatPercent);
+        } else if (difference > 0) {
+          return '+${config.f.format(difference)}';
         } else {
-          return f.format(difference);
+          return config.f.format(difference);
         }
       }
     }
@@ -281,7 +293,9 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
       if (index == 0) {
         return 'fat. %';
       } else {
-        if (difference > 0) {
+        if (difference == null) {
+          return 'fat. %';
+        } else if (difference > 0) {
           return '+fat. %';
         } else {
           return '-fat. %';
@@ -310,7 +324,7 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
             ),
             padding: const EdgeInsets.symmetric(
               horizontal: 20,
-              vertical: 15,
+              // vertical: 15,
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -323,7 +337,7 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
                             getFatString(),
                             style: const TextStyle(
                               fontSize: 20,
-                              height: 1.05,
+                              // height: 1.05,
                             ),
                           ),
                           Text(
@@ -331,7 +345,7 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
                             style: TextStyle(
                               fontSize: 20,
                               color: colors.greyColor,
-                              height: 1.05,
+                              // height: 1.05,
                             ),
                           ),
                         ],
@@ -342,7 +356,7 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
                           style: TextStyle(
                             fontSize: 20,
                             color: colors.greyColor,
-                            height: 1.05,
+                            // height: 1.05,
                           ),
                         ),
                       ),
@@ -418,9 +432,9 @@ class DashboardHeaderPersistentDelegate extends SliverPersistentHeaderDelegate {
               // mainAxisSize: MainAxisSize.max,
               children: [
                 ValueListenableBuilder(
-                  valueListenable: config.box,
+                  valueListenable: config.daylyData,
                   builder: (context, value, _) {
-                    var item = config.box.value.get(method.dateToKey());
+                    var item = config.box.get(method.dateToKey());
                     double foodSumm = 0;
                     double expendSumm = 0;
                     for (Map<String, int> element in item!.food) {
@@ -434,7 +448,9 @@ class DashboardHeaderPersistentDelegate extends SliverPersistentHeaderDelegate {
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) {
-                              return const CaloriesDetails();
+                              return CaloriesDetails(
+                                data: item,
+                              );
                             },
                           ),
                         );
@@ -443,7 +459,7 @@ class DashboardHeaderPersistentDelegate extends SliverPersistentHeaderDelegate {
                         'Calories',
                         '${(foodSumm - expendSumm).toInt()} kcal',
                         shrinkPercentage,
-                        circularChart(foodSumm, expendSumm,'60%'),
+                        circularChart(foodSumm, expendSumm, '60%'),
                       ),
                     );
                   },
@@ -451,11 +467,31 @@ class DashboardHeaderPersistentDelegate extends SliverPersistentHeaderDelegate {
                 SizedBox(
                   width: method.hSizeCalc(20),
                 ),
-                _topContainer(
-                  'Fat',
-                  '-0.5%',
-                  shrinkPercentage,
-                  cartesianChart(3),
+                ValueListenableBuilder(
+                  valueListenable: config.daylyData,
+                  builder: (context, value, _) {
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return const FatDetails();
+                            },
+                          ),
+                        );
+                      },
+                      child: _topContainer(
+                        'Fat',
+                        getDifference(),
+                        shrinkPercentage,
+                        cartesianChart(
+                          max(1.5, 3.32 * (1 - shrinkPercentage)),
+                          max(0.45, 0.9 * (1 - shrinkPercentage)),
+                          method.getChartFatData(),
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
@@ -516,34 +552,11 @@ class DashboardHeaderPersistentDelegate extends SliverPersistentHeaderDelegate {
                   child: ValueListenableBuilder(
                     valueListenable: tabGraphPageIndex,
                     builder: (context, value, widget) {
-                      return Row(
-                        children: [
-                          tabButton(
-                            ontap: () {
-                              graphPageTabController.animateTo(
-                                0,
-                              );
-                              tabGraphPageIndex.value = 0;
-                            },
-                            buttonColor: tabGraphPageIndex.value == 0 ? colors.mainColor : Colors.white,
-                            text: 'Calories',
-                            textColor: tabGraphPageIndex.value != 0 ? colors.mainColor : Colors.white,
-                          ),
-                          SizedBox(
-                            width: method.hSizeCalc(20),
-                          ),
-                          tabButton(
-                            ontap: () {
-                              graphPageTabController.animateTo(
-                                1,
-                              );
-                              tabGraphPageIndex.value = 1;
-                            },
-                            buttonColor: tabGraphPageIndex.value == 1 ? colors.mainColor : Colors.white,
-                            text: 'Fat',
-                            textColor: tabGraphPageIndex.value != 1 ? colors.mainColor : Colors.white,
-                          ),
-                        ],
+                      return customTabBar(
+                        'Calories',
+                        'Fat',
+                        graphPageTabController,
+                        tabGraphPageIndex,
                       );
                     },
                   ),
@@ -554,6 +567,21 @@ class DashboardHeaderPersistentDelegate extends SliverPersistentHeaderDelegate {
         ],
       ),
     );
+  }
+
+  String getDifference() {
+    List data = method.getChartFatData();
+    var f = NumberFormat("###.##");
+    if (data.isNotEmpty) {
+      var dif = data.last.x - data.first.x;
+      if (dif > 0) {
+        return '+${f.format(dif)} %';
+      } else {
+        return '${f.format(dif)} %';
+      }
+    } else {
+      return 'No data';
+    }
   }
 
   Widget _topContainer(

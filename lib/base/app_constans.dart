@@ -36,6 +36,9 @@ class AppTextStyles {
     fontSize: 20,
     color: colors.mainColor,
   );
+  final TextStyle black20TS = const TextStyle(
+    fontSize: 20,
+  );
   final TextStyle grey16TS1 = TextStyle(
     fontSize: 16,
     color: colors.greyColor,
@@ -58,6 +61,8 @@ final metrix = AppMetrix();
 class AppLongStrings {
   final String attentionText =
       'The content in our app is not medical advice or a substitute for professional medical care, diagnosis or treatment. Your doctor will determine your specific needs and advise you personally during consultations on what medication to take.';
+  final String articleDesc =
+      'C4 Pre-Workout supplements are a product line by Cellucor, a company that sells fitness equipment, drinks, and supplements.';
 }
 
 final longString = AppLongStrings();
@@ -71,6 +76,7 @@ class AppIconsPaths {
   final String checkMark = 'lib/assets/svg/check.svg';
   final String uncheckMark = 'lib/assets/svg/uncheck.svg';
   final String fireIcon = 'lib/assets/svg/fire.svg';
+  final String player = 'lib/assets/svg/player_icon.svg';
 }
 
 final ipath = AppIconsPaths();
@@ -78,6 +84,8 @@ final ipath = AppIconsPaths();
 class AppPngPaths {
   final String starPng = 'lib/assets/images/star_and_ribbon.png';
   final String dumbbPng = 'lib/assets/images/pink_dumbbell.png';
+  final String c4preWork = 'lib/assets/images/c4item.png';
+  final String fakePlayer = 'lib/assets/images/videoGag.png';
 }
 
 final ppath = AppPngPaths();

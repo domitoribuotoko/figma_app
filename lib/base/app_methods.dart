@@ -9,6 +9,7 @@ import 'app_classes.dart';
 import 'dart:ui' as ui;
 import 'dart:math' as math;
 import 'package:intl/intl.dart' as intl;
+import 'package:http/http.dart' as http;
 
 class AppMethods {
   double ratio() {
@@ -37,8 +38,77 @@ class AppMethods {
     );
   }
 
+  String dateFormat(DateTime time) {
+    return intl.DateFormat('dd.MM.y').format(
+      time,
+    );
+  }
+
   getPackageInfo() async {
     // AppConfig.packageInfo = await PackageInfo.fromPlatform();
+  }
+
+  String getLinkFromId(String id) {
+    String youtubeUrl = 'https://www.youtube.com/watch?v=$id';
+    return youtubeUrl;
+  }
+
+  String getLinkToVideoPreviewMaxRes(String id) {
+    String link = 'https://i.ytimg.com/vi/$id/maxresdefault.jpg';
+    return link;
+  }
+
+  String getLinkToVideoPreviewHQRes(String id) {
+    String link = 'https://i.ytimg.com/vi/$id/hqdefault.jpg';
+    return link;
+  }
+
+  Future<bool> validateImage(String link) async {
+    bool checkIfImage(String param) {
+      if (param == 'image/jpeg' || param == 'image/png' || param == 'image/gif') {
+        return true;
+      }
+      return false;
+    }
+
+    http.Response res;
+    try {
+      res = await http.get(Uri.parse(link));
+    } catch (e) {
+      return false;
+    }
+
+    if (res.statusCode != 200) return false;
+    Map<String, dynamic> data = res.headers;
+    return checkIfImage(data['content-type']);
+  }
+
+  Future<Image> getVideoPreview(String id) async {
+    if (await validateImage(getLinkToVideoPreviewMaxRes(id)) == true) {
+      return Image.network(
+        getLinkToVideoPreviewMaxRes(id),
+      );
+    } else {
+      return Image.network(
+        getLinkToVideoPreviewHQRes(id),
+      );
+    }
+  }
+
+  List<FatData> getChartFatData() {
+    List<FatData> data = [];
+    for (var i = 0; i < config.box.values.length; i++) {
+      var element = config.box.values.elementAt(i);
+      if (element.fat != null) {
+        data.add(
+          FatData(
+            element.fat!.bodyFatPercentage,
+            element.date,
+          ),
+        );
+      }
+    }
+    return data;
   }
 
   getHiveList() async {
@@ -46,13 +116,14 @@ class AppMethods {
       ..init(await getApplicationDocumentsDirectory().then((value) => value.path))
       ..registerAdapter(FatAdapter())
       ..registerAdapter(AppDaylyDataAdapter());
-    config.box = ValueNotifier<Box<AppDaylyData>>(await Hive.openBox(
+    config.box = await Hive.openBox(
       'mainBox',
-    ));
+    );
     // await config.box.value.deleteFromDisk();
-    if (!config.box.value.containsKey(dateToKey())) {
-      await config.box.value.put(dateToKey(), AppDaylyData(date: DateTime.now()));
+    if (!config.box.containsKey(dateToKey())) {
+      await config.box.put(dateToKey(), AppDaylyData(date: DateTime.now()));
     }
+    config.daylyData = ValueNotifier<String>(config.box.get(method.dateToKey())!.date.toString());
   }
 
   double getLog10(double x) {
@@ -129,7 +200,7 @@ class AppMethods {
     return values;
   }
 
-  Shader setSweepGradienForCircularChart(ChartShaderDetails chartShaderDetails, Value data, double maximum) {
+  Shader setSweepGradienForCircularChart(ChartShaderDetails chartShaderDetails, CaloriesValue data, double maximum) {
     int dataRatio() {
       double degree = 360 * (data.calories / maximum);
       return degree.toInt() == 0 ? 1 : degree.toInt();
