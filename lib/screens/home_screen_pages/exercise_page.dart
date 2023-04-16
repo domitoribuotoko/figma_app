@@ -96,7 +96,6 @@ class _ExercisePageState extends State<ExercisePage> {
               color: colors.greyColor,
             ),
           ),
-          const Text('f')
         ],
       ),
     );
