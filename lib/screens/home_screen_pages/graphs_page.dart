@@ -258,7 +258,7 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
     var item = config.box.getAt(index);
     late AppDaylyData? itemBefore;
     late double? fatBefore;
-    late double? difference;
+    double? difference;
     var fatPercent = item!.fat?.bodyFatPercentage;
 
     if (index > 0 && fatPercent != null) {
@@ -269,19 +269,16 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
           i = config.box.length;
         }
       }
-      if (fatBefore == null) {
-      } else {
+      if (fatBefore != null) {
         difference = fatPercent - fatBefore;
       }
     }
 
     String getFatValue() {
-      if (index == 0) {
+      if (index == 0 || difference == null) {
         return config.f.format(fatPercent);
       } else {
-        if (difference == null) {
-          return config.f.format(fatPercent);
-        } else if (difference > 0) {
+        if (difference > 0) {
           return '+${config.f.format(difference)}';
         } else {
           return config.f.format(difference);
@@ -290,12 +287,10 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
     }
 
     String getFatString() {
-      if (index == 0) {
+      if (index == 0 || difference == null) {
         return 'fat. %';
       } else {
-        if (difference == null) {
-          return 'fat. %';
-        } else if (difference > 0) {
+        if (difference > 0) {
           return '+fat. %';
         } else {
           return '-fat. %';
@@ -352,7 +347,7 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
                       )
                     : Center(
                         child: Text(
-                          'No this day fat data',
+                          'Not recorded fat data this day',
                           style: TextStyle(
                             fontSize: 20,
                             color: colors.greyColor,
@@ -571,13 +566,12 @@ class DashboardHeaderPersistentDelegate extends SliverPersistentHeaderDelegate {
 
   String getDifference() {
     List data = method.getChartFatData();
-    var f = NumberFormat("###.##");
     if (data.isNotEmpty) {
       var dif = data.last.x - data.first.x;
       if (dif > 0) {
-        return '+${f.format(dif)} %';
+        return '+${config.f.format(dif)} %';
       } else {
-        return '${f.format(dif)} %';
+        return '${config.f.format(dif)} %';
       }
     } else {
       return 'No data';
@@ -656,7 +650,7 @@ class DashboardHeaderPersistentDelegate extends SliverPersistentHeaderDelegate {
                   child: Row(
                     children: [
                       Opacity(
-                        opacity: progress * progress * progress,
+                        opacity: pow(progress, 3).toDouble(),
                         child: Text(
                           bottomText,
                           style: TextStyle(

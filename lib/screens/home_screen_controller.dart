@@ -1,5 +1,6 @@
 import 'package:figma_app/base/app_classes.dart';
 import 'package:figma_app/base/app_constans.dart';
+import 'package:figma_app/screens/home_screen_pages/dummy_json.dart';
 import 'package:figma_app/screens/home_screen_pages/exercise_page.dart';
 import 'package:figma_app/screens/home_screen_pages/graphs_page.dart';
 import 'package:figma_app/screens/home_screen_pages/article_video_page.dart';
@@ -28,7 +29,7 @@ class _HomeScreenControllerState extends State<HomeScreenController> {
         child: PageView.builder(
           physics: const NeverScrollableScrollPhysics(),
           controller: _pageController,
-          itemCount: 3,
+          itemCount: 4,
           onPageChanged: (value) {
             _activePage.value = value;
           },
@@ -37,6 +38,7 @@ class _HomeScreenControllerState extends State<HomeScreenController> {
               const ExercisePage(),
               const GraphsPage(),
               const ArticlesVideosPage(),
+              const DummyJson(),
             ].elementAt(index);
           },
         ),
@@ -50,6 +52,7 @@ class _HomeScreenControllerState extends State<HomeScreenController> {
               highlightColor: Colors.transparent,
             ),
             child: BottomNavigationBar(
+              type: BottomNavigationBarType.fixed,
               showSelectedLabels: false,
               showUnselectedLabels: false,
               selectedLabelStyle: const TextStyle(
@@ -71,6 +74,7 @@ class _HomeScreenControllerState extends State<HomeScreenController> {
                 bottomBarItem(ipath.awardSvg),
                 bottomBarItem(ipath.graphsSvg),
                 bottomBarItem(ipath.calendarSvg),
+                bottomBarItem(ipath.dummy),
               ],
             ),
           );

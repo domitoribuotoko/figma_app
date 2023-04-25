@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 class AppConfig {
   late Box<AppDaylyData> box;
   late ValueNotifier<String> daylyData;
-
   var f = NumberFormat("###.##");
 }
 

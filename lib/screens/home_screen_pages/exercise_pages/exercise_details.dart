@@ -1,5 +1,6 @@
 import 'package:figma_app/base/app_classes.dart';
 import 'package:figma_app/base/app_constans.dart';
+import 'package:figma_app/base/app_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -98,12 +99,32 @@ class _ExerciseDetailsState extends State<ExerciseDetails> {
           ),
           Container(
             margin: const EdgeInsets.symmetric(
-              vertical: 20,
+              vertical: 10,
+            ),
+            constraints: const BoxConstraints(
+              maxHeight: 300,
+              minHeight: 300,
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: Image.network(
-                picUrl,
+              child: Center(
+                child: FutureBuilder(
+                  future: method.validateImage(picUrl),
+                  builder: (context, snapshot) {
+                    if (snapshot.data == true) {
+                      return Image.network(
+                        picUrl,
+                      );
+                    }
+                    if (snapshot.data == false) {
+                      return Center(
+                        child: Image.asset(ppath.exHolder),
+                      );
+                    } else {
+                      return const PlaceHolderSkeletonWidget();
+                    }
+                  },
+                ),
               ),
             ),
           ),

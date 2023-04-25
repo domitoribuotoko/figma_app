@@ -16,7 +16,7 @@ class ArticlesVideosPage extends StatefulWidget {
   State<ArticlesVideosPage> createState() => _ArticlesVideosPageState();
 }
 
-class _ArticlesVideosPageState extends State<ArticlesVideosPage> with SingleTickerProviderStateMixin {
+class _ArticlesVideosPageState extends State<ArticlesVideosPage> with TickerProviderStateMixin {
   late TabController _tabController;
   ValueNotifier<int> pageIndex = ValueNotifier<int>(0);
   final MyInAppBrowser browser = MyInAppBrowser();
@@ -90,9 +90,10 @@ class _ArticlesVideosPageState extends State<ArticlesVideosPage> with SingleTick
           controller: _tabController,
           children: [
             ListView.builder(
+              cacheExtent: 30,
               itemCount: articleData.length,
               itemBuilder: (context, index) {
-                return articleContainer(
+                return articleOrVideoContainer(
                   'article',
                   articleData[index].title,
                   articleData[index].urlLink,
@@ -102,7 +103,7 @@ class _ArticlesVideosPageState extends State<ArticlesVideosPage> with SingleTick
             ListView.builder(
               itemCount: videoData.length,
               itemBuilder: (context, index) {
-                return articleContainer(
+                return articleOrVideoContainer(
                   'video',
                   videoData[index].title,
                   videoData[index].id,
@@ -115,7 +116,7 @@ class _ArticlesVideosPageState extends State<ArticlesVideosPage> with SingleTick
     );
   }
 
-  Widget articleContainer(String tab, String title, String url) {
+  Widget articleOrVideoContainer(String tab, String title, String url) {
     return Container(
       padding: EdgeInsets.all(method.hSizeCalc(15)),
       margin: const EdgeInsets.only(bottom: 20),
@@ -126,6 +127,7 @@ class _ArticlesVideosPageState extends State<ArticlesVideosPage> with SingleTick
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // const PlaceHolderSkeletonWidget(),
           Padding(
             padding: EdgeInsets.only(bottom: method.hSizeCalc(10)),
             child: Text(
@@ -137,52 +139,11 @@ class _ArticlesVideosPageState extends State<ArticlesVideosPage> with SingleTick
             ),
           ),
           tab == 'article'
-              ? AnyLinkPreview(
-                  cache: const Duration(minutes: 1),
-                  onTap: () {
-                    browser.openUrlRequest(
-                      urlRequest: URLRequest(
-                        url: Uri.parse(url),
-                      ),
-                      options: options,
-                    );
-                  },
-                  link: url,
-                  displayDirection: UIDirection.uiDirectionHorizontal,
-                  titleStyle: const TextStyle(fontSize: 0),
-                  backgroundColor: Colors.white,
-                  removeElevation: true,
-                  bodyMaxLines: 5,
-                  bodyStyle: TextStyle(
-                    color: colors.greyColor,
-                    fontSize: 16,
-                    height: 1.33,
+              ? Container(
+                  constraints: const BoxConstraints(
+                    maxHeight: 118,
                   ),
-                  errorWidget: Container(
-                    constraints: const BoxConstraints(
-                      minHeight: 118,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Center(
-                      child: Text('Cannot load url'),
-                    ),
-                  ),
-                  previewHeight: 118,
-                  placeholderWidget: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    constraints: const BoxConstraints(
-                      minHeight: 118,
-                    ),
-                    child: const Center(
-                      child: Text('Loading'),
-                    ),
-                  ),
+                  child: anylinkWidget(url),
                 )
               : GestureDetector(
                   onTap: () {
@@ -192,13 +153,6 @@ class _ArticlesVideosPageState extends State<ArticlesVideosPage> with SingleTick
                       ),
                       options: options,
                     );
-                    // Navigator.of(context).push(
-                    //   MaterialPageRoute(
-                    //     builder: (context) {
-                    //       return PlayerPage(id: url);
-                    //     },
-                    //   ),
-                    // );
                   },
                   child: Container(
                     constraints: const BoxConstraints(
@@ -237,6 +191,99 @@ class _ArticlesVideosPageState extends State<ArticlesVideosPage> with SingleTick
                 ),
         ],
       ),
+    );
+  }
+
+  Widget anylinkWidget(String url) {
+    return AnyLinkPreview.builder(
+      link: url,
+      placeholderWidget: const PlaceHolderSkeletonWidget(),
+      errorWidget: errorWidget(),
+      itemBuilder: (p0, p1, p2) {
+        return GestureDetector(
+          onTap: () {
+            browser.openUrlRequest(
+              urlRequest: URLRequest(
+                url: Uri.parse(url),
+              ),
+              options: options,
+            );
+          },
+          child: Row(
+            children: [
+              Flexible(
+                flex: 1,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image(
+                    image: p2!,
+                    height: 118,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              Flexible(
+                flex: 2,
+                child: Container(
+                  margin: const EdgeInsets.only(
+                    left: 12,
+                  ),
+                  child: Text(
+                    p1.desc!,
+                    maxLines: 5,
+                    style: TextStyle(
+                      color: colors.greyColor,
+                      fontSize: 16,
+                      height: 1.33,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget errorWidget() {
+    return Row(
+      children: [
+        Flexible(
+          flex: 1,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Image.asset(
+              ppath.c4preWork,
+              height: 118,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        Flexible(
+          flex: 2,
+          child: Container(
+            margin: const EdgeInsets.only(
+              left: 12,
+            ),
+            child: Center(
+              child: Text(
+                'Cannot Load url',
+                maxLines: 5,
+                style: TextStyle(
+                  color: colors.greyColor,
+                  fontSize: 16,
+                  height: 1.33,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

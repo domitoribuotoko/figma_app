@@ -77,6 +77,7 @@ class AppIconsPaths {
   final String uncheckMark = 'lib/assets/svg/uncheck.svg';
   final String fireIcon = 'lib/assets/svg/fire.svg';
   final String player = 'lib/assets/svg/player_icon.svg';
+  final String dummy = 'lib/assets/svg/dummy.svg';
 }
 
 final ipath = AppIconsPaths();
@@ -86,6 +87,7 @@ class AppPngPaths {
   final String dumbbPng = 'lib/assets/images/pink_dumbbell.png';
   final String c4preWork = 'lib/assets/images/c4item.png';
   final String fakePlayer = 'lib/assets/images/videoGag.png';
+  final String exHolder = 'lib/assets/images/exercisePlaceholder.png';
 }
 
 final ppath = AppPngPaths();

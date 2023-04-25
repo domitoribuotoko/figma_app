@@ -1,5 +1,6 @@
 import 'package:figma_app/base/app_constans.dart';
 import 'package:figma_app/base/app_methods.dart';
+import 'package:figma_app/base/app_widgets.dart';
 import 'package:figma_app/base/exercise_base.dart';
 import 'package:figma_app/screens/home_screen_pages/exercise_pages/exercise_details.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +32,7 @@ class _ExercisePageState extends State<ExercisePage> {
           horizontal: method.hSizeCalc(20),
         ),
         child: ListView.builder(
+          cacheExtent: 20,
           itemCount: exercises.modelContent.length,
           itemBuilder: (context, index) {
             var item = exercises.modelContent[index];
@@ -82,10 +84,30 @@ class _ExercisePageState extends State<ExercisePage> {
             margin: const EdgeInsets.symmetric(
               vertical: 10,
             ),
+            constraints: const BoxConstraints(
+              maxHeight: 300,
+              minHeight: 300,
+            ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: Image.network(
-                picUrl,
+              child: Center(
+                child: FutureBuilder(
+                  future: method.validateImage(picUrl),
+                  builder: (context, snapshot) {
+                    if (snapshot.data == true) {
+                      return Image.network(
+                        picUrl,
+                      );
+                    }
+                    if (snapshot.data == false) {
+                      return Center(
+                        child: Image.asset(ppath.exHolder),
+                      );
+                    } else {
+                      return const PlaceHolderSkeletonWidget();
+                    }
+                  },
+                ),
               ),
             ),
           ),

@@ -46,92 +46,94 @@ Widget circularChart(double maxValue, double expenditure, String innerRadius) {
 }
 
 Widget cartesianChart(double size, double borderWidth, List<FatData> getChartFatData) {
-  if (getChartFatData.isEmpty || getChartFatData.length < 3) {
-    return const Text(
-      'Not enough fat data',
-      textAlign: TextAlign.center,
-    );
-  } else {
-    double maxValue() {
-      final List<double> values = [];
-      for (var element in getChartFatData) {
-        values.add(element.x);
-      }
-      values.sort();
-      return values.last;
+  double maxValue() {
+    final List<double> values = [];
+    for (var element in getChartFatData) {
+      values.add(element.x);
     }
-
-    DateTime getVisibleMinimum() {
-      if (getChartFatData.length < 7) {
-        return getChartFatData[0].t;
-      } else {
-        return DateTime.now().subtract(const Duration(days: 6));
-      }
-    }
-
-    List<SplineAreaSeries<FatData, dynamic>> getDefaultData(double size, double borderWidth) {
-      return <SplineAreaSeries<FatData, dynamic>>[
-        SplineAreaSeries<FatData, dynamic>(
-          dataSource: getChartFatData,
-          xValueMapper: (FatData sales, _) => sales.t,
-          yValueMapper: (FatData sales, _) => sales.x,
-          yAxisName: 'Date',
-          splineType: SplineType.cardinal,
-          gradient: LinearGradient(
-            colors: [colors.cartesianGradient, colors.cartesianGradient.withOpacity(0.1)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-          animationDuration: 0,
-          borderDrawMode: BorderDrawMode.top,
-          markerSettings: MarkerSettings(
-            isVisible: true,
-            borderColor: const Color(0xff88a2ff),
-            color: Colors.white,
-            height: size,
-            width: size,
-            borderWidth: borderWidth,
-          ),
-        ),
-      ];
-    }
-
-    return SfCartesianChart(
-      margin: const EdgeInsets.all(0),
-      series: getDefaultData(size, borderWidth),
-      zoomPanBehavior: ZoomPanBehavior(
-        enablePanning: true,
-        zoomMode: ZoomMode.x,
-      ),
-      primaryXAxis: DateTimeAxis(
-        isVisible: false,
-        // visibleMaximum: DateTime.now(),
-        interval: 1,
-        intervalType: DateTimeIntervalType.days,
-        visibleMinimum: getVisibleMinimum(),
-        axisLine: const AxisLine(
-          width: 0,
-        ),
-      ),
-      primaryYAxis: NumericAxis(
-        anchorRangeToVisiblePoints: false,
-        visibleMaximum: maxValue(),
-        interval: 1,
-        isVisible: false,
-        axisLine: const AxisLine(
-          width: 0,
-        ),
-      ),
-      plotAreaBorderWidth: 0,
-      // enableAxisAnimation: true,
-      // onMarkerRender: (MarkerRenderArgs args) {
-      //   if (!(args.pointIndex == 2)) {
-      //     args.markerHeight = 0.0;
-      //     args.markerWidth = 0.0;
-      //   }
-      // },
-    );
+    values.sort();
+    return values.last;
   }
+
+  if (getChartFatData.isEmpty || getChartFatData.length < 3) {
+    getChartFatData = [
+      FatData(20, DateTime.now()),
+      FatData(19.5, DateTime.now().subtract(const Duration(days: -1))),
+      FatData(18.5, DateTime.now().subtract(const Duration(days: -2))),
+      // FatData(2.3, DateTime.now().subtract(const Duration(days: -3))),
+    ];
+  }
+
+  DateTime getVisibleMinimum() {
+    if (getChartFatData.length < 7) {
+      return getChartFatData[0].t;
+    } else {
+      return DateTime.now().subtract(const Duration(days: 6));
+    }
+  }
+
+  List<SplineAreaSeries<FatData, dynamic>> getDefaultData(double size, double borderWidth) {
+    return <SplineAreaSeries<FatData, dynamic>>[
+      SplineAreaSeries<FatData, dynamic>(
+        dataSource: getChartFatData,
+        xValueMapper: (FatData sales, _) => sales.t,
+        yValueMapper: (FatData sales, _) => sales.x,
+        yAxisName: 'Date',
+        splineType: SplineType.monotonic,
+        gradient: LinearGradient(
+          colors: [colors.cartesianGradient, colors.cartesianGradient.withOpacity(0.1)],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+        animationDuration: 0,
+        borderDrawMode: BorderDrawMode.top,
+        markerSettings: MarkerSettings(
+          isVisible: true,
+          borderColor: const Color(0xff88a2ff),
+          color: Colors.white,
+          height: size,
+          width: size,
+          borderWidth: borderWidth,
+        ),
+      ),
+    ];
+  }
+
+  return SfCartesianChart(
+    margin: const EdgeInsets.all(0),
+    series: getDefaultData(size, borderWidth),
+    zoomPanBehavior: ZoomPanBehavior(
+      enablePanning: true,
+      zoomMode: ZoomMode.x,
+    ),
+    primaryXAxis: DateTimeAxis(
+      isVisible: false,
+      // visibleMaximum: DateTime.now(),
+      interval: 1,
+      intervalType: DateTimeIntervalType.days,
+      visibleMinimum: getVisibleMinimum(),
+      axisLine: const AxisLine(
+        width: 0,
+      ),
+    ),
+    primaryYAxis: NumericAxis(
+      anchorRangeToVisiblePoints: false,
+      visibleMaximum: maxValue(),
+      // interval: 1,
+      isVisible: false,
+      axisLine: const AxisLine(
+        width: 0,
+      ),
+    ),
+    plotAreaBorderWidth: 0,
+    // enableAxisAnimation: true,
+    // onMarkerRender: (MarkerRenderArgs args) {
+    //   if (!(args.pointIndex == 2)) {
+    //     args.markerHeight = 0.0;
+    //     args.markerWidth = 0.0;
+    //   }
+    // },
+  );
 }
 
 Widget tabButton({
@@ -285,4 +287,136 @@ Widget customTabBar(String leftTitle, String rightTitle, TabController controlle
       ),
     ],
   );
+}
+
+class PlaceHolderSkeletonWidget extends StatefulWidget {
+  const PlaceHolderSkeletonWidget({super.key});
+
+  @override
+  State<PlaceHolderSkeletonWidget> createState() => _PlaceHolderSkeletonWidgetState();
+}
+
+class _PlaceHolderSkeletonWidgetState extends State<PlaceHolderSkeletonWidget> with TickerProviderStateMixin {
+  late AnimationController aC1;
+  late AnimationController aC2;
+  late AnimationController aC3;
+  late Animation<double> a;
+  late Animation<double> b;
+  late Animation<double> c;
+
+  @override
+  void initState() {
+    super.initState();
+    aC1 = AnimationController(duration: const Duration(milliseconds: 1000), vsync: this);
+    aC2 = AnimationController(duration: const Duration(milliseconds: 1000), vsync: this);
+    aC3 = AnimationController(duration: const Duration(milliseconds: 1000), vsync: this);
+    a = Tween<double>(begin: 0.0, end: 1.0).animate(aC1);
+    b = Tween<double>(begin: 0.0, end: 1.0).animate(aC2);
+    c = Tween<double>(begin: 0.0, end: 1.0).animate(aC3);
+    firstValue();
+    secondValue();
+    thirdValue();
+    if (mounted) {
+      aC1.forward();
+    }
+  }
+
+  @override
+  void dispose() {
+    aC1.dispose();
+    aC2.dispose();
+    aC3.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: aC1,
+      builder: (context, _) {
+        return AnimatedBuilder(
+          animation: aC3,
+          builder: (context, _) {
+            return Container(
+              constraints: const BoxConstraints(
+                minHeight: 118,
+              ),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                gradient: LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: [
+                    Colors.grey.shade200,
+                    Colors.grey.shade400,
+                    Colors.grey.shade200,
+                  ],
+                  stops: [
+                    c.value,
+                    b.value,
+                    a.value,
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  firstValue() {
+    c.addListener(
+      () {
+        if (c.isCompleted) {
+          aC3.reverse();
+        }
+        if (c.status.name == 'reverse') {
+          if (c.value > 0.8) {
+            return;
+          } else {
+            aC2.reverse();
+          }
+        }
+      },
+    );
+  }
+
+  secondValue() {
+    a.addListener(
+      () {
+        if (a.status.name == 'forward') {
+          if (a.value < 0.2) {
+            return;
+          } else {
+            aC2.forward();
+          }
+        }
+        if (a.isDismissed) {
+          aC1.forward();
+        }
+      },
+    );
+  }
+
+  thirdValue() {
+    b.addListener(
+      () {
+        if (b.status.name == 'forward') {
+          if (b.value < 0.2) {
+            return;
+          } else {
+            aC3.forward();
+          }
+        }
+        if (b.status.name == 'reverse') {
+          if (b.value > 0.8) {
+            return;
+          } else {
+            aC1.reverse();
+          }
+        }
+      },
+    );
+  }
 }
