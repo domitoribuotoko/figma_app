@@ -121,8 +121,9 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
                       handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
                     ),
                     SliverToBoxAdapter(
-                      child: Builder(
-                        builder: (context) {
+                      child: ValueListenableBuilder(
+                        valueListenable: config.fatSettings,
+                        builder: (context, valeu, _) {
                           WidgetsBinding.instance.addPostFrameCallback(
                             (timeStamp) {
                               _tabBarScrollHeight = context.size!.height;
