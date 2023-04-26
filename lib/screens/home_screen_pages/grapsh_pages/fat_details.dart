@@ -17,7 +17,7 @@ class _FatDetailsState extends State<FatDetails> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: colors.mainBackgrounColor,
-      appBar: defaultAppBar(context, 'Fat'),
+      appBar: defaultAppBar(context, 'Fat', true),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -52,56 +52,63 @@ class _FatDetailsState extends State<FatDetails> {
     var item = config.box.getAt(index);
     Fat? fat = item!.fat;
 
-    return Padding(
-      padding: EdgeInsets.only(
-        left: method.hSizeCalc(20),
-        right: method.hSizeCalc(20),
-        bottom: 30,
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Text(
-                method.dateFormat(item.date),
-                style: TextStyle(
-                  fontSize: 16,
-                  color: colors.greyColor,
-                ),
+    return ValueListenableBuilder(
+        valueListenable: config.fatSettings,
+        builder: (context, value, _) {
+          return Visibility(
+            visible: fat != null ? true : config.fatSettings.value,
+            child: Padding(
+              padding: EdgeInsets.only(
+                left: method.hSizeCalc(20),
+                right: method.hSizeCalc(20),
+                bottom: 30,
               ),
-            ],
-          ),
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            padding: EdgeInsets.symmetric(vertical: 15, horizontal: method.hSizeCalc(20)),
-            child: fat != null
-                ? Column(
-                    children: [
-                      rowFatDetails('Body fat percentage', '${config.f.format(fat.bodyFatPercentage)} %'),
-                      rowFatDetails('Fat mass', '${config.f.format(fat.fatMass)} kg'),
-                      rowFatDetails('Mass without fat', '${config.f.format(fat.massWithoutFat)} kg'),
-                      rowFatDetails('Category', fat.category),
-                    ],
-                  )
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+              child: Column(
+                children: [
+                  Row(
                     children: [
                       Text(
-                        'No this day fat data',
+                        method.dateFormat(item.date),
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: 16,
                           color: colors.greyColor,
                         ),
                       ),
                     ],
                   ),
-          ),
-        ],
-      ),
-    );
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 15, horizontal: method.hSizeCalc(20)),
+                    child: fat != null
+                        ? Column(
+                            children: [
+                              rowFatDetails('Body fat percentage', '${config.f.format(fat.bodyFatPercentage)} %'),
+                              rowFatDetails('Fat mass', '${config.f.format(fat.fatMass)} kg'),
+                              rowFatDetails('Mass without fat', '${config.f.format(fat.massWithoutFat)} kg'),
+                              rowFatDetails('Category', fat.category),
+                            ],
+                          )
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'No this day fat data',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color: colors.greyColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
   }
 
   rowFatDetails(String name, String value) {

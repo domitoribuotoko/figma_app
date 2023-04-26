@@ -262,7 +262,7 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
     var fatPercent = item!.fat?.bodyFatPercentage;
 
     if (index > 0 && fatPercent != null) {
-      for (var i = 1; i < config.box.length; i++) {
+      for (var i = 1; i < index + 1; i++) {
         itemBefore = config.box.getAt(index - i);
         fatBefore = itemBefore!.fat?.bodyFatPercentage;
         if (fatBefore != null) {
@@ -298,68 +298,86 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
       }
     }
 
-    return Padding(
-      padding: const EdgeInsets.only(top: 20),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(
-                DateFormat('dd.MM.y').format(item.date),
-                style: tS.grey16TS1,
-              ),
-            ],
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) {
+              return const FatDetails();
+            },
           ),
-          Container(
-            height: 51,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20,
-              // vertical: 15,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                fatPercent != null
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            getFatString(),
-                            style: const TextStyle(
-                              fontSize: 20,
-                              // height: 1.05,
-                            ),
-                          ),
-                          Text(
-                            ' ${getFatValue()} %',
-                            style: TextStyle(
-                              fontSize: 20,
-                              color: colors.greyColor,
-                              // height: 1.05,
-                            ),
-                          ),
-                        ],
-                      )
-                    : Center(
-                        child: Text(
-                          'Not recorded fat data this day',
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: colors.greyColor,
-                            // height: 1.05,
-                          ),
+        );
+      },
+      child: ValueListenableBuilder(
+          valueListenable: config.fatSettings,
+          builder: (context, value, _) {
+            return Visibility(
+              visible: fatPercent != null ? true : config.fatSettings.value,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 20),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          DateFormat('dd.MM.y').format(item.date),
+                          style: tS.grey16TS1,
                         ),
+                      ],
+                    ),
+                    Container(
+                      height: 51,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
                       ),
-              ],
-            ),
-          )
-        ],
-      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        // vertical: 15,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          fatPercent != null
+                              ? Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      getFatString(),
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        // height: 1.05,
+                                      ),
+                                    ),
+                                    Text(
+                                      ' ${getFatValue()} %',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        color: colors.greyColor,
+                                        // height: 1.05,
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : Center(
+                                  child: Text(
+                                    'Not recorded fat data this day',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      color: colors.greyColor,
+                                      // height: 1.05,
+                                    ),
+                                  ),
+                                ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            );
+          }),
     );
   }
 }

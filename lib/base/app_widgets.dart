@@ -1,4 +1,5 @@
 import 'package:figma_app/base/app_constans.dart';
+import 'package:figma_app/screens/home_screen_pages/grapsh_pages/fat_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -220,7 +221,7 @@ Widget formField({
   );
 }
 
-PreferredSizeWidget defaultAppBar(context, String title) {
+PreferredSizeWidget defaultAppBar(context, String title, bool showSettings) {
   return AppBar(
     backgroundColor: Colors.transparent,
     automaticallyImplyLeading: false,
@@ -253,6 +254,31 @@ PreferredSizeWidget defaultAppBar(context, String title) {
         ),
       ],
     ),
+    actions: [
+      Visibility(
+        visible: showSettings,
+        child: Padding(
+          padding: const EdgeInsets.only(right: 7),
+          child: IconButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) {
+                    return const FatSettings();
+                  },
+                ),
+              );
+            },
+            splashRadius: 1,
+            icon: const Icon(
+              Icons.settings,
+              color: Colors.black,
+              size: 35,
+            ),
+          ),
+        ),
+      ),
+    ],
   );
 }
 

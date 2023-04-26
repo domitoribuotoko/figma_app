@@ -4,6 +4,7 @@ import 'package:figma_app/base/app_constans.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'app_classes.dart';
 import 'dart:ui' as ui;
@@ -12,6 +13,19 @@ import 'package:intl/intl.dart' as intl;
 import 'package:http/http.dart' as http;
 
 class AppMethods {
+  initSp() async {
+    config.sharedPreferences = await SharedPreferences.getInstance();
+    var value = config.sharedPreferences.getBool('fatSettings');
+    if (value == null) {
+      await config.sharedPreferences.setBool('fatSettings', true);
+    }
+    config.fatSettings = ValueNotifier<bool>(config.sharedPreferences.getBool('fatSettings')!);
+  }
+
+  fatSettingsSet(bool value) async {
+    await config.sharedPreferences.setBool('fatSettings', value);
+  }
+
   double ratio() {
     late double size;
     size = metrix.screenHeight / 844;
