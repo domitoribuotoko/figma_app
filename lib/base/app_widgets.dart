@@ -182,7 +182,7 @@ Widget tabButton({
     style: TextButton.styleFrom(
       backgroundColor: buttonColor,
       foregroundColor: Colors.white.withOpacity(0.8),
-      minimumSize: Size(method.hSizeCalc(165), method.vSizeCalc(41)),
+      minimumSize: Size(method.hSizeCalc(165), 50),
       // maximumSize:  const Size(165, 41),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),

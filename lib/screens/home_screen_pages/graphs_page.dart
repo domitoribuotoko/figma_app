@@ -521,8 +521,8 @@ class DashboardHeaderPersistentDelegate extends SliverPersistentHeaderDelegate {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Container(
-                  margin: EdgeInsets.only(
-                    top: 10 + (40 * (1 - shrinkPercentage)),
+                  margin: const EdgeInsets.only(
+                    top: 10,
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -549,7 +549,7 @@ class DashboardHeaderPersistentDelegate extends SliverPersistentHeaderDelegate {
                         style: TextButton.styleFrom(
                           backgroundColor: colors.redColor,
                           foregroundColor: Colors.white,
-                          minimumSize: Size(method.hSizeCalc(74), 50),
+                          maximumSize: Size(method.hSizeCalc(74), 50),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -697,7 +697,7 @@ class DashboardHeaderPersistentDelegate extends SliverPersistentHeaderDelegate {
   }
 
   @override
-  double get maxExtent => method.ratio() > 1 ? method.hSizeCalc(390) : 390;
+  double get maxExtent => 265 + (method.hSizeCalc(165)-50);
 
   @override
   double get minExtent => isScrollable ? 200 : currentSize;
