@@ -50,7 +50,7 @@ class _CaloriesDetailsState extends State<CaloriesDetails> {
                         child: circularChart(
                           foodSumm,
                           expendSumm,
-                          '77%',
+                          '77%',context,
                         ),
                       ),
                       SizedBox(

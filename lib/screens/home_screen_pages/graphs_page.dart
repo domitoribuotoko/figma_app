@@ -473,7 +473,12 @@ class DashboardHeaderPersistentDelegate extends SliverPersistentHeaderDelegate {
                         'Calories',
                         '${(foodSumm - expendSumm).toInt()} kcal',
                         shrinkPercentage,
-                        circularChart(foodSumm, expendSumm, '60%'),
+                        circularChart(
+                          foodSumm,
+                          expendSumm,
+                          '60%',
+                          context,
+                        ),
                       ),
                     );
                   },
@@ -502,6 +507,7 @@ class DashboardHeaderPersistentDelegate extends SliverPersistentHeaderDelegate {
                           max(1.5, 3.32 * (1 - shrinkPercentage)),
                           max(0.45, 0.9 * (1 - shrinkPercentage)),
                           method.getChartFatData(),
+                          context,
                         ),
                       ),
                     );
@@ -691,7 +697,7 @@ class DashboardHeaderPersistentDelegate extends SliverPersistentHeaderDelegate {
   }
 
   @override
-  double get maxExtent => 390;
+  double get maxExtent => method.ratio() > 1 ? method.hSizeCalc(390) : 390;
 
   @override
   double get minExtent => isScrollable ? 200 : currentSize;

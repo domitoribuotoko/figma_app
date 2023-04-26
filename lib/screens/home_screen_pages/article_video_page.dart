@@ -117,44 +117,53 @@ class _ArticlesVideosPageState extends State<ArticlesVideosPage> with TickerProv
   }
 
   Widget articleOrVideoContainer(String tab, String title, String url) {
-    return Container(
-      padding: EdgeInsets.all(method.hSizeCalc(15)),
-      margin: const EdgeInsets.only(bottom: 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // const PlaceHolderSkeletonWidget(),
-          Padding(
-            padding: EdgeInsets.only(bottom: method.hSizeCalc(10)),
-            child: Text(
-              title,
-              style: const TextStyle(
-                fontSize: 20,
-                height: 1.05,
+    return GestureDetector(
+      onTap: () {
+        if (tab == 'article') {
+          browser.openUrlRequest(
+            urlRequest: URLRequest(
+              url: Uri.parse(url),
+            ),
+            options: options,
+          );
+        } else {
+          browser.openUrlRequest(
+            urlRequest: URLRequest(
+              url: Uri.parse(method.getLinkFromId(url)),
+            ),
+            options: options,
+          );
+        }
+      },
+      child: Container(
+        padding: EdgeInsets.all(method.hSizeCalc(15)),
+        margin: const EdgeInsets.only(bottom: 20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // const PlaceHolderSkeletonWidget(),
+            Padding(
+              padding: EdgeInsets.only(bottom: method.hSizeCalc(10)),
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 20,
+                  height: 1.05,
+                ),
               ),
             ),
-          ),
-          tab == 'article'
-              ? Container(
-                  constraints: const BoxConstraints(
-                    maxHeight: 118,
-                  ),
-                  child: anylinkWidget(url),
-                )
-              : GestureDetector(
-                  onTap: () {
-                    browser.openUrlRequest(
-                      urlRequest: URLRequest(
-                        url: Uri.parse(method.getLinkFromId(url)),
-                      ),
-                      options: options,
-                    );
-                  },
-                  child: Container(
+            tab == 'article'
+                ? Container(
+                    constraints: const BoxConstraints(
+                      maxHeight: 118,
+                    ),
+                    child: anylinkWidget(url),
+                  )
+                : Container(
                     constraints: const BoxConstraints(
                       maxHeight: 166,
                       minHeight: 166,
@@ -188,8 +197,8 @@ class _ArticlesVideosPageState extends State<ArticlesVideosPage> with TickerProv
                       },
                     ),
                   ),
-                ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -200,49 +209,39 @@ class _ArticlesVideosPageState extends State<ArticlesVideosPage> with TickerProv
       placeholderWidget: const PlaceHolderSkeletonWidget(),
       errorWidget: errorWidget(),
       itemBuilder: (p0, p1, p2) {
-        return GestureDetector(
-          onTap: () {
-            browser.openUrlRequest(
-              urlRequest: URLRequest(
-                url: Uri.parse(url),
+        return Row(
+          children: [
+            Flexible(
+              flex: 1,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image(
+                  image: p2!,
+                  height: 118,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
               ),
-              options: options,
-            );
-          },
-          child: Row(
-            children: [
-              Flexible(
-                flex: 1,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Image(
-                    image: p2!,
-                    height: 118,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
+            ),
+            Flexible(
+              flex: 2,
+              child: Container(
+                margin: const EdgeInsets.only(
+                  left: 12,
+                ),
+                child: Text(
+                  p1.desc == null ? p1.title! : p1.desc!,
+                  maxLines: 5,
+                  style: TextStyle(
+                    color: colors.greyColor,
+                    fontSize: 16,
+                    height: 1.33,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ),
-              Flexible(
-                flex: 2,
-                child: Container(
-                  margin: const EdgeInsets.only(
-                    left: 12,
-                  ),
-                  child: Text(
-                    p1.desc!,
-                    maxLines: 5,
-                    style: TextStyle(
-                      color: colors.greyColor,
-                      fontSize: 16,
-                      height: 1.33,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         );
       },
     );

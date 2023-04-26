@@ -32,7 +32,7 @@ class _FatDetailsState extends State<FatDetails> {
                     child: cartesianChart(
                       method.hSizeCalc(9),
                       2,
-                      method.getChartFatData(),
+                      method.getChartFatData(),context,
                     ),
                   ),
                 ),
