@@ -83,8 +83,9 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
                       handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
                     ),
                     SliverToBoxAdapter(
-                      child: Builder(
-                        builder: (context) {
+                      child: ValueListenableBuilder(
+                        valueListenable: config.isShowFakeData,
+                        builder: (context, value, _) {
                           WidgetsBinding.instance.addPostFrameCallback(
                             (timeStamp) {
                               _tabBarScrollHeight = context.size!.height;
@@ -93,12 +94,13 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
                           );
                           return Column(
                             children: List<Widget>.generate(
-                              config.box.length,
+                              config.isShowFakeData.value == false ? config.box.length : config.fakeDataBox.length,
                               (index) {
-                                if (config.box.isEmpty) {
-                                  return const Text('no data');
-                                }
-                                if (index == config.box.length - 1) {
+                                var item = config.isShowFakeData.value == false ? config.box : config.fakeDataBox;
+                                // if (config.box.isEmpty) {
+                                //   return const Text('no data');
+                                // }
+                                if (index == item.length - 1) {
                                   return ValueListenableBuilder(
                                     valueListenable: config.daylyData,
                                     builder: (context, value, child) {
@@ -122,7 +124,7 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
                     ),
                     SliverToBoxAdapter(
                       child: ValueListenableBuilder(
-                        valueListenable: config.fatSettings,
+                        valueListenable: config.isShowFakeData,
                         builder: (context, valeu, _) {
                           WidgetsBinding.instance.addPostFrameCallback(
                             (timeStamp) {
@@ -132,12 +134,13 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
                           );
                           return Column(
                             children: List<Widget>.generate(
-                              config.box.length,
+                              config.isShowFakeData.value == false ? config.box.length : config.fakeDataBox.length,
                               (index) {
-                                if (config.box.isEmpty) {
-                                  return const Text('no data');
-                                }
-                                if (index == config.box.length - 1) {
+                                var item = config.isShowFakeData.value == false ? config.box : config.fakeDataBox;
+                                // if (item.isEmpty) {
+                                //   return const Text('no data');
+                                // }
+                                if (index == item.length - 1) {
                                   return ValueListenableBuilder(
                                     valueListenable: config.daylyData,
                                     builder: (context, value, child) {
@@ -163,10 +166,15 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
   }
 
   Widget _caloriesTabContainer(int index) {
-    var item = config.box.getAt(index);
+    late AppDaylyData item;
+    if (config.isShowFakeData.value == false) {
+      item = config.box.getAt(index)!;
+    } else {
+      item = config.fakeDataBox.getAt(index)!;
+    }
     var foodSumm = 0;
     var expendSumm = 0;
-    for (Map<String, int> element in item!.food) {
+    for (Map<String, int> element in item.food) {
       foodSumm = foodSumm + element.values.first;
     }
     for (Map<String, int> element in item.expenditure) {
@@ -256,18 +264,31 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
   }
 
   Widget _fatTabContainer(int index) {
-    var item = config.box.getAt(index);
+    late AppDaylyData item;
+    if (config.isShowFakeData.value == false) {
+      item = config.box.getAt(index)!;
+    } else {
+      item = config.fakeDataBox.getAt(index)!;
+    }
     late AppDaylyData? itemBefore;
     late double? fatBefore;
     double? difference;
-    var fatPercent = item!.fat?.bodyFatPercentage;
+    var fatPercent = item.fat?.bodyFatPercentage;
 
     if (index > 0 && fatPercent != null) {
       for (var i = 1; i < index + 1; i++) {
-        itemBefore = config.box.getAt(index - i);
-        fatBefore = itemBefore!.fat?.bodyFatPercentage;
+        if (config.isShowFakeData.value == false) {
+          itemBefore = config.box.getAt(index - i)!;
+        } else {
+          itemBefore = config.fakeDataBox.getAt(index - i)!;
+        }
+        fatBefore = itemBefore.fat?.bodyFatPercentage;
         if (fatBefore != null) {
-          i = config.box.length;
+          if (config.isShowFakeData.value == false) {
+            i = config.box.length;
+          } else {
+            i = config.fakeDataBox.length;
+          }
         }
       }
       if (fatBefore != null) {
@@ -442,79 +463,65 @@ class DashboardHeaderPersistentDelegate extends SliverPersistentHeaderDelegate {
                 method.hSizeCalc(165) * (1 - shrinkPercentage),
               ),
             ),
-            child: Row(
-              // mainAxisSize: MainAxisSize.max,
-              children: [
-                ValueListenableBuilder(
-                  valueListenable: config.daylyData,
-                  builder: (context, value, _) {
-                    var item = config.box.get(method.dateToKey());
-                    double foodSumm = 0;
-                    double expendSumm = 0;
-                    for (Map<String, int> element in item!.food) {
-                      foodSumm = foodSumm + element.values.first;
-                    }
-                    for (Map<String, int> element in item.expenditure) {
-                      expendSumm = expendSumm + element.values.first;
-                    }
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return CaloriesDetails(
-                                data: item,
-                              );
-                            },
-                          ),
-                        );
-                      },
-                      child: _topContainer(
-                        'Calories',
-                        '${(foodSumm - expendSumm).toInt()} kcal',
-                        shrinkPercentage,
-                        circularChart(
-                          foodSumm,
-                          expendSumm,
-                          '60%',
-                          context,
-                        ),
+            child: ValueListenableBuilder(
+                valueListenable: config.isShowFakeData,
+                builder: (context, value, _) {
+                  return Row(
+                    // mainAxisSize: MainAxisSize.max,
+                    children: [
+                      ValueListenableBuilder(
+                        valueListenable: config.daylyData,
+                        builder: (context, value, _) {
+                          late AppDaylyData item;
+                          if (config.isShowFakeData.value == false) {
+                            item = config.box.get(method.dateToKey())!;
+                          } else {
+                            item = config.fakeDataBox.getAt(13)!;
+                          }
+                          double foodSumm = 0;
+                          double expendSumm = 0;
+                          for (Map<String, int> element in item.food) {
+                            foodSumm = foodSumm + element.values.first;
+                          }
+                          for (Map<String, int> element in item.expenditure) {
+                            expendSumm = expendSumm + element.values.first;
+                          }
+                          return _topContainer(
+                            'Calories',
+                            '${(foodSumm - expendSumm).toInt()} kcal',
+                            shrinkPercentage,
+                            circularChart(
+                              foodSumm,
+                              expendSumm,
+                              '60%',
+                              context,
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
-                SizedBox(
-                  width: method.hSizeCalc(20),
-                ),
-                ValueListenableBuilder(
-                  valueListenable: config.daylyData,
-                  builder: (context, value, _) {
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return const FatDetails();
-                            },
-                          ),
-                        );
-                      },
-                      child: _topContainer(
-                        'Fat',
-                        getDifference(),
-                        shrinkPercentage,
-                        cartesianChart(
-                          max(1.5, 3.32 * (1 - shrinkPercentage)),
-                          max(0.45, 0.9 * (1 - shrinkPercentage)),
-                          method.getChartFatData(),
-                          context,
-                        ),
+                      SizedBox(
+                        width: method.hSizeCalc(20),
                       ),
-                    );
-                  },
-                ),
-              ],
-            ),
+                      ValueListenableBuilder(
+                        valueListenable: config.daylyData,
+                        builder: (context, value, _) {
+                          return _topContainer(
+                            'Fat',
+                            getDifference(),
+                            shrinkPercentage,
+                            cartesianChart(
+                              max(1.5, 3.32 * (1 - shrinkPercentage)),
+                              max(0.45, 0.9 * (1 - shrinkPercentage)),
+                              method.getChartFatData(),
+                              context,
+                              false,
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  );
+                }),
           ),
           Expanded(
             child: Column(
@@ -697,7 +704,7 @@ class DashboardHeaderPersistentDelegate extends SliverPersistentHeaderDelegate {
   }
 
   @override
-  double get maxExtent => 265 + (method.hSizeCalc(165)-50);
+  double get maxExtent => 265 + (method.hSizeCalc(165) - 50);
 
   @override
   double get minExtent => isScrollable ? 200 : currentSize;

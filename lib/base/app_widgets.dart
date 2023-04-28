@@ -1,13 +1,10 @@
 import 'package:figma_app/base/app_constans.dart';
-import 'package:figma_app/screens/home_screen_pages/grapsh_pages/calories_details.dart';
 import 'package:figma_app/screens/home_screen_pages/grapsh_pages/fat_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import '../screens/home_screen_pages/grapsh_pages/fat_details.dart';
 import 'app_classes.dart';
-import 'app_config.dart';
 import 'app_methods.dart';
 
 Widget circularChart(double maxValue, double expenditure, String innerRadius, BuildContext context) {
@@ -27,49 +24,42 @@ Widget circularChart(double maxValue, double expenditure, String innerRadius, Bu
             : CornerStyle.endCurve;
   }
 
-  return Stack(
-    children: [
-      SfCircularChart(
-        margin: const EdgeInsets.all(0),
-        onCreateShader: (chartShaderDetails) {
-          return method.setSweepGradienForCircularChart(chartShaderDetails, data[0], maxValue);
-        },
-        series: <CircularSeries>[
-          RadialBarSeries<CaloriesValue, String>(
-            radius: '100%',
-            strokeColor: Colors.blue,
-            animationDuration: 0,
-            dataSource: data,
-            xValueMapper: (CaloriesValue data, _) => data.x,
-            yValueMapper: (CaloriesValue data, _) => data.calories,
-            maximumValue: data[0].calories.toDouble() > maxValue ? data[0].calories.toDouble() : maxValue,
-            cornerStyle: setCurves(),
-            innerRadius: innerRadius,
-            trackColor: colors.lightGreyColor,
-          ),
-        ],
-      ),
-      GestureDetector(
-        onTap: () {
-          var item = config.box.get(method.dateToKey());
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) {
-                return CaloriesDetails(data: item!);
-              },
-            ),
-          );
-        },
+  return SfCircularChart(
+    margin: const EdgeInsets.all(0),
+    onCreateShader: (chartShaderDetails) {
+      return method.setSweepGradienForCircularChart(chartShaderDetails, data[0], maxValue);
+    },
+    series: <CircularSeries>[
+      RadialBarSeries<CaloriesValue, String>(
+        radius: '100%',
+        strokeColor: Colors.blue,
+        animationDuration: 0,
+        dataSource: data,
+        xValueMapper: (CaloriesValue data, _) => data.x,
+        yValueMapper: (CaloriesValue data, _) => data.calories,
+        maximumValue: data[0].calories.toDouble() > maxValue ? data[0].calories.toDouble() : maxValue,
+        cornerStyle: setCurves(),
+        innerRadius: innerRadius,
+        trackColor: colors.lightGreyColor,
       ),
     ],
   );
 }
 
-Widget cartesianChart(double size, double borderWidth, List<FatData> getChartFatData, BuildContext context) {
+Widget cartesianChart(
+    double size, double borderWidth, List<FatData> getChartFatData, BuildContext context, bool isDetailed) {
   double maxValue() {
     final List<double> values = [];
-    for (var element in getChartFatData) {
-      values.add(element.x);
+    if (isDetailed) {
+      for (var element in getChartFatData) {
+        values.add(element.x);
+      }
+    } else {
+      for (var i = getChartFatData.length-1; i > -1; i--) {
+        if (values.length < 7) {
+          values.add(getChartFatData[i].x);
+        }
+      }
     }
     values.sort();
     return values.last;
@@ -77,9 +67,9 @@ Widget cartesianChart(double size, double borderWidth, List<FatData> getChartFat
 
   if (getChartFatData.isEmpty || getChartFatData.length < 3) {
     getChartFatData = [
-      FatData(20, DateTime.now()),
-      FatData(19.5, DateTime.now().subtract(const Duration(days: -1))),
-      FatData(18.5, DateTime.now().subtract(const Duration(days: -2))),
+      FatData(1.5, DateTime.now()),
+      FatData(2, DateTime.now().subtract(const Duration(days: -1))),
+      FatData(1.5, DateTime.now().subtract(const Duration(days: -2))),
       // FatData(2.3, DateTime.now().subtract(const Duration(days: -3))),
     ];
   }
@@ -119,55 +109,40 @@ Widget cartesianChart(double size, double borderWidth, List<FatData> getChartFat
     ];
   }
 
-  return Stack(
-    children: [
-      SfCartesianChart(
-        margin: const EdgeInsets.all(0),
-        series: getDefaultData(size, borderWidth),
-        zoomPanBehavior: ZoomPanBehavior(
-          enablePanning: true,
-          zoomMode: ZoomMode.x,
-        ),
-        primaryXAxis: DateTimeAxis(
-          isVisible: false,
-          // visibleMaximum: DateTime.now(),
-          interval: 1,
-          intervalType: DateTimeIntervalType.days,
-          visibleMinimum: getVisibleMinimum(),
-          axisLine: const AxisLine(
-            width: 0,
-          ),
-        ),
-        primaryYAxis: NumericAxis(
-          anchorRangeToVisiblePoints: false,
-          visibleMaximum: maxValue(),
-          // interval: 1,
-          isVisible: false,
-          axisLine: const AxisLine(
-            width: 0,
-          ),
-        ),
-        plotAreaBorderWidth: 0,
-        // enableAxisAnimation: true,
-        // onMarkerRender: (MarkerRenderArgs args) {
-        //   if (!(args.pointIndex == 2)) {
-        //     args.markerHeight = 0.0;
-        //     args.markerWidth = 0.0;
-        //   }
-        // },
+  return SfCartesianChart(
+    margin: const EdgeInsets.all(0),
+    series: getDefaultData(size, borderWidth),
+    zoomPanBehavior: ZoomPanBehavior(
+      enablePanning: isDetailed,
+      zoomMode: ZoomMode.x,
+    ),
+    primaryXAxis: DateTimeAxis(
+      isVisible: false,
+      // visibleMaximum: DateTime.now(),
+      interval: 1,
+      intervalType: DateTimeIntervalType.days,
+      visibleMinimum: getVisibleMinimum(),
+      axisLine: const AxisLine(
+        width: 0,
       ),
-      GestureDetector(
-        onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) {
-                return const FatDetails();
-              },
-            ),
-          );
-        },
+    ),
+    primaryYAxis: NumericAxis(
+      anchorRangeToVisiblePoints: false,
+      visibleMaximum: maxValue(),
+      // interval: 1,
+      isVisible: false,
+      axisLine: const AxisLine(
+        width: 0,
       ),
-    ],
+    ),
+    plotAreaBorderWidth: 0,
+    // enableAxisAnimation: true,
+    // onMarkerRender: (MarkerRenderArgs args) {
+    //   if (!(args.pointIndex == 2)) {
+    //     args.markerHeight = 0.0;
+    //     args.markerWidth = 0.0;
+    //   }
+    // },
   );
 }
 
@@ -298,7 +273,7 @@ PreferredSizeWidget defaultAppBar(context, String title, bool showSettings) {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) {
-                    return const FatSettings();
+                    return const Settings();
                   },
                 ),
               );

@@ -19,38 +19,49 @@ class _FatDetailsState extends State<FatDetails> {
       backgroundColor: colors.mainBackgrounColor,
       appBar: defaultAppBar(context, 'Fat', true),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 20, bottom: 50),
-                  child: SizedBox(
-                    width: method.hSizeCalc(262),
-                    height: method.hSizeCalc(262),
-                    child: cartesianChart(
-                      method.hSizeCalc(9),
-                      2,
-                      method.getChartFatData(),context,
-                    ),
+        child: ValueListenableBuilder(
+            valueListenable: config.isShowFakeData,
+            builder: (context, value, _) {
+              return Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 20, bottom: 50),
+                        child: SizedBox(
+                          width: method.hSizeCalc(262),
+                          height: method.hSizeCalc(262),
+                          child: cartesianChart(
+                            method.hSizeCalc(9),
+                            2,
+                            method.getChartFatData(),
+                            context,
+                            true,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-            ...List<Widget>.generate(
-              config.box.length,
-              (index) => daylyFatContainer(index),
-            ).reversed,
-          ],
-        ),
+                  ...List<Widget>.generate(
+                    config.isShowFakeData.value == false ? config.box.length : config.fakeDataBox.length,
+                    (index) => daylyFatContainer(index),
+                  ).reversed,
+                ],
+              );
+            }),
       ),
     );
   }
 
   daylyFatContainer(int index) {
-    var item = config.box.getAt(index);
-    Fat? fat = item!.fat;
+    late AppDaylyData item;
+    if (config.isShowFakeData.value == false) {
+      item = config.box.getAt(index)!;
+    } else {
+      item = config.fakeDataBox.getAt(index)!;
+    }
+    Fat? fat = item.fat;
 
     return ValueListenableBuilder(
         valueListenable: config.fatSettings,
@@ -130,17 +141,4 @@ class _FatDetailsState extends State<FatDetails> {
     );
   }
 }
-
-/*
-
-
-
-
-
-
-
-
-
-
- */
 

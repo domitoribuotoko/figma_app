@@ -3,6 +3,7 @@ import 'package:figma_app/base/app_config.dart';
 import 'package:figma_app/base/app_constans.dart';
 import 'package:figma_app/base/app_methods.dart';
 import 'package:figma_app/base/app_widgets.dart';
+import 'package:figma_app/screens/home_screen_pages/grapsh_pages/fat_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -89,10 +90,32 @@ class _CalculatePageState extends State<CalculatePage> with TickerProviderStateM
               child: ValueListenableBuilder(
                 valueListenable: _tabIndex,
                 builder: (context, value, widget) {
-                  return customTabBar('Calories','Fat',_tabController, _tabIndex);
+                  return customTabBar('Calories', 'Fat', _tabController, _tabIndex);
                 },
               ),
             ),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 7),
+                child: IconButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return const Settings();
+                        },
+                      ),
+                    );
+                  },
+                  splashRadius: 1,
+                  icon: const Icon(
+                    Icons.settings,
+                    color: Colors.black,
+                    size: 35,
+                  ),
+                ),
+              ),
+            ],
           ),
           backgroundColor: colors.mainBackgrounColor,
           body: Padding(

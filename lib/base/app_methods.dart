@@ -15,15 +15,27 @@ import 'package:http/http.dart' as http;
 class AppMethods {
   initSp() async {
     config.sharedPreferences = await SharedPreferences.getInstance();
+
     var value = config.sharedPreferences.getBool('fatSettings');
     if (value == null) {
       await config.sharedPreferences.setBool('fatSettings', true);
     }
     config.fatSettings = ValueNotifier<bool>(config.sharedPreferences.getBool('fatSettings')!);
+    value = null;
+
+    value = config.sharedPreferences.getBool('showFakeData');
+    if (value == null) {
+      await config.sharedPreferences.setBool('showFakeData', false);
+    }
+    config.isShowFakeData = ValueNotifier<bool>(config.sharedPreferences.getBool('showFakeData')!);
   }
 
   fatSettingsSet(bool value) async {
     await config.sharedPreferences.setBool('fatSettings', value);
+  }
+
+  fakeDataSet(bool value) async {
+    await config.sharedPreferences.setBool('showFakeData', value);
   }
 
   double ratio() {
@@ -111,17 +123,32 @@ class AppMethods {
 
   List<FatData> getChartFatData() {
     List<FatData> data = [];
-    for (var i = 0; i < config.box.values.length; i++) {
-      var element = config.box.values.elementAt(i);
-      if (element.fat != null) {
-        data.add(
-          FatData(
-            element.fat!.bodyFatPercentage,
-            element.date,
-          ),
-        );
+    if (config.isShowFakeData.value == false) {
+      for (var i = 0; i < config.box.values.length; i++) {
+        var element = config.box.values.elementAt(i);
+        if (element.fat != null) {
+          data.add(
+            FatData(
+              element.fat!.bodyFatPercentage,
+              element.date,
+            ),
+          );
+        }
+      }
+    } else {
+      for (var i = 0; i < config.fakeDataBox.values.length; i++) {
+        var element = config.fakeDataBox.values.elementAt(i);
+        if (element.fat != null) {
+          data.add(
+            FatData(
+              element.fat!.bodyFatPercentage,
+              element.date,
+            ),
+          );
+        }
       }
     }
+
     return data;
   }
 
@@ -130,14 +157,49 @@ class AppMethods {
       ..init(await getApplicationDocumentsDirectory().then((value) => value.path))
       ..registerAdapter(FatAdapter())
       ..registerAdapter(AppDaylyDataAdapter());
-    config.box = await Hive.openBox(
-      'mainBox',
-    );
-    // await config.box.value.deleteFromDisk();
+    config.box = await Hive.openBox('mainBox');
+    config.fakeDataBox = await Hive.openBox('fakeDataBox');
+
+    if (config.fakeDataBox.isEmpty) {
+      await putFakeData();
+    }
+    if (method.dateFormat(config.fakeDataBox.getAt(13)!.date) != method.dateFormat(DateTime.now())) {
+      await config.fakeDataBox.deleteFromDisk();
+      config.fakeDataBox = await Hive.openBox('fakeDataBox');
+      await putFakeData();
+    }
+
     if (!config.box.containsKey(dateToKey())) {
       await config.box.put(dateToKey(), AppDaylyData(date: DateTime.now()));
     }
     config.daylyData = ValueNotifier<String>(config.box.get(method.dateToKey())!.date.toString());
+  }
+
+  putFakeData() async {
+    for (var i = 0; i < 14; i++) {
+      await config.fakeDataBox.add(
+        AppDaylyData(
+          date: DateTime.now().subtract(Duration(days: 13 - i)),
+          fat: Fat(30 - (i.toDouble() + math.Random().nextDouble()), 5, 65, 'FakeData'),
+        )
+          ..food.addAll(
+            List<Map<String, int>>.generate(
+              math.Random().nextInt(3) + 1,
+              (index) {
+                return {'Product $index': math.Random().nextInt(300) + 100};
+              },
+            ),
+          )
+          ..expenditure.addAll(
+            List<Map<String, int>>.generate(
+              math.Random().nextInt(3) + 1,
+              (index) {
+                return {'Expenditure $index': math.Random().nextInt(300) + 100};
+              },
+            ),
+          ),
+      );
+    }
   }
 
   double getLog10(double x) {
@@ -217,6 +279,9 @@ class AppMethods {
   Shader setSweepGradienForCircularChart(ChartShaderDetails chartShaderDetails, CaloriesValue data, double maximum) {
     int dataRatio() {
       double degree = 360 * (data.calories / maximum);
+      if (degree.toString() == 'NaN') {
+        degree = 0;
+      }
       return degree.toInt() == 0 ? 1 : degree.toInt();
     }
 
