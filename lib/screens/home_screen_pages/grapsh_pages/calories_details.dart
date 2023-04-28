@@ -31,7 +31,7 @@ class _CaloriesDetailsState extends State<CaloriesDetails> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: colors.mainBackgrounColor,
-      appBar: defaultAppBar(context, 'Calories', false),
+      appBar: defaultAppBar(context, 'Calories', true),
       body: SingleChildScrollView(
         child: Column(
           children: [

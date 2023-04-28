@@ -58,6 +58,8 @@ Widget cartesianChart(
       for (var i = getChartFatData.length-1; i > -1; i--) {
         if (values.length < 7) {
           values.add(getChartFatData[i].x);
+        }else{
+          break;
         }
       }
     }
