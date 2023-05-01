@@ -10,8 +10,8 @@ class AppConfig {
   late ValueNotifier<String> daylyData;
   var f = NumberFormat("###.##");
   late SharedPreferences sharedPreferences;
-  late ValueNotifier<bool>  fatSettings;
-  late ValueNotifier<bool>  isShowFakeData;
+  late ValueNotifier<bool> fatSettings;
+  late ValueNotifier<bool> isShowFakeData;
 }
 
 final config = AppConfig();

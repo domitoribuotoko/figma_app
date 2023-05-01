@@ -5,9 +5,9 @@ import 'package:figma_app/base/app_config.dart';
 import 'package:figma_app/base/app_constans.dart';
 import 'package:figma_app/base/app_methods.dart';
 import 'package:figma_app/base/app_widgets.dart';
-import 'package:figma_app/screens/home_screen_pages/grapsh_pages/calculate_page.dart';
-import 'package:figma_app/screens/home_screen_pages/grapsh_pages/calories_details.dart';
-import 'package:figma_app/screens/home_screen_pages/grapsh_pages/fat_details.dart';
+import 'package:figma_app/screens/home_screen_pages/graphs_pages/calculate_page.dart';
+import 'package:figma_app/screens/home_screen_pages/graphs_pages/calories_details.dart';
+import 'package:figma_app/screens/home_screen_pages/graphs_pages/fat_details.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -574,7 +574,7 @@ class DashboardHeaderPersistentDelegate extends SliverPersistentHeaderDelegate {
                 ),
                 Padding(
                   padding: EdgeInsets.only(
-                    top: 10 + (20 * (1 - shrinkPercentage)),
+                    top: 12 + (20 * (1 - shrinkPercentage)),
                   ),
                   child: ValueListenableBuilder(
                     valueListenable: tabGraphPageIndex,
@@ -707,7 +707,7 @@ class DashboardHeaderPersistentDelegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => 265 + (method.hSizeCalc(165) - 50);
 
   @override
-  double get minExtent => isScrollable ? 200 : currentSize;
+  double get minExtent => isScrollable ? 203 : currentSize;
 
   @override
   bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) => true;

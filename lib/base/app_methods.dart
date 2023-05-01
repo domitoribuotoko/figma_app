@@ -70,10 +70,6 @@ class AppMethods {
     );
   }
 
-  getPackageInfo() async {
-    // AppConfig.packageInfo = await PackageInfo.fromPlatform();
-  }
-
   String getLinkFromId(String id) {
     String youtubeUrl = 'https://www.youtube.com/watch?v=$id';
     return youtubeUrl;

@@ -3,7 +3,7 @@ import 'package:figma_app/base/app_config.dart';
 import 'package:figma_app/base/app_constans.dart';
 import 'package:figma_app/base/app_methods.dart';
 import 'package:figma_app/base/app_widgets.dart';
-import 'package:figma_app/screens/home_screen_pages/grapsh_pages/fat_settings.dart';
+import 'package:figma_app/screens/home_screen_pages/graphs_pages/fat_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';

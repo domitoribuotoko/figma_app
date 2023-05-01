@@ -1,5 +1,5 @@
 import 'package:figma_app/base/app_constans.dart';
-import 'package:figma_app/screens/home_screen_pages/grapsh_pages/fat_settings.dart';
+import 'package:figma_app/screens/home_screen_pages/graphs_pages/fat_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -47,7 +47,12 @@ Widget circularChart(double maxValue, double expenditure, String innerRadius, Bu
 }
 
 Widget cartesianChart(
-    double size, double borderWidth, List<FatData> getChartFatData, BuildContext context, bool isDetailed) {
+  double size,
+  double borderWidth,
+  List<FatData> getChartFatData,
+  BuildContext context,
+  bool isDetailed,
+) {
   double maxValue() {
     final List<double> values = [];
     if (isDetailed) {
@@ -55,10 +60,10 @@ Widget cartesianChart(
         values.add(element.x);
       }
     } else {
-      for (var i = getChartFatData.length-1; i > -1; i--) {
+      for (var i = getChartFatData.length - 1; i > -1; i--) {
         if (values.length < 7) {
           values.add(getChartFatData[i].x);
-        }else{
+        } else {
           break;
         }
       }
