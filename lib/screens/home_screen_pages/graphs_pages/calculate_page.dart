@@ -1,8 +1,10 @@
+import 'package:easy_localization/easy_localization.dart' as locale;
 import 'package:figma_app/base/app_classes.dart';
 import 'package:figma_app/base/app_config.dart';
 import 'package:figma_app/base/app_constans.dart';
 import 'package:figma_app/base/app_methods.dart';
 import 'package:figma_app/base/app_widgets.dart';
+import 'package:figma_app/generated/locale_keys.g.dart';
 import 'package:figma_app/screens/home_screen_pages/graphs_pages/fat_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -77,7 +79,7 @@ class _CalculatePageState extends State<CalculatePage> with TickerProviderStateM
                   ),
                 ),
                 Text(
-                  'Calculate',
+                  LocaleKeys.calculate.tr(),
                   style: tS.main32TS,
                 ),
               ],
@@ -90,7 +92,12 @@ class _CalculatePageState extends State<CalculatePage> with TickerProviderStateM
               child: ValueListenableBuilder(
                 valueListenable: _tabIndex,
                 builder: (context, value, widget) {
-                  return customTabBar('Calories', 'Fat', _tabController, _tabIndex);
+                  return customTabBar(
+                    LocaleKeys.calories.tr(),
+                    LocaleKeys.fFat.tr(),
+                    _tabController,
+                    _tabIndex,
+                  );
                 },
               ),
             ),
@@ -128,7 +135,9 @@ class _CalculatePageState extends State<CalculatePage> with TickerProviderStateM
               children: [
                 Column(
                   children: [
-                    switcherDefault('calories'),
+                    switcherDefault(
+                      'calories',
+                    ),
                     Expanded(
                       child: CustomScrollView(
                         slivers: [
@@ -145,7 +154,9 @@ class _CalculatePageState extends State<CalculatePage> with TickerProviderStateM
                 ),
                 Column(
                   children: [
-                    switcherDefault('fat'),
+                    switcherDefault(
+                      'fat',
+                    ),
                     Expanded(
                       child: CustomScrollView(
                         shrinkWrap: true,
@@ -182,8 +193,8 @@ Widget caloriesAdd(GlobalKey<FormState> formKey, BuildContext context) {
         child: Column(
           children: [
             formField(
-              fieldName: caloriesSwitcher.value ? 'Food' : 'Expenditure',
-              hintText: caloriesSwitcher.value ? 'Product name' : 'Expenditure Name',
+              fieldName: caloriesSwitcher.value ? LocaleKeys.food.tr() : LocaleKeys.expenditure.tr(),
+              hintText: caloriesSwitcher.value ? LocaleKeys.productName.tr() : LocaleKeys.expenditureName.tr(),
               onSaved: (newValue) {
                 name = newValue!.trim();
               },
@@ -196,7 +207,7 @@ Widget caloriesAdd(GlobalKey<FormState> formKey, BuildContext context) {
               type: '',
             ),
             formField(
-              fieldName: 'Number of calories',
+              fieldName: LocaleKeys.numberOfCalories.tr(),
               onSaved: (newValue) {
                 calories = int.parse(newValue!.trim());
               },
@@ -207,7 +218,7 @@ Widget caloriesAdd(GlobalKey<FormState> formKey, BuildContext context) {
                 return null;
               },
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              type: 'kcal',
+              type: LocaleKeys.kcal.tr(),
             ),
             addButton(
               formKey,
@@ -237,10 +248,10 @@ Widget caloriesAdd(GlobalKey<FormState> formKey, BuildContext context) {
 Widget fatAdd(GlobalKey<FormState> formKey, BuildContext context) {
   Map<String, double> measures = {};
   List<String> formNames = [
-    'Height',
-    'Weight',
-    'Neck girth',
-    'Waist circumference',
+    LocaleKeys.height.tr(),
+    LocaleKeys.weight.tr(),
+    LocaleKeys.neckGirth.tr(),
+    LocaleKeys.waistCircumference.tr(),
   ];
   return Column(
     children: [
@@ -262,7 +273,7 @@ Widget fatAdd(GlobalKey<FormState> formKey, BuildContext context) {
                 return null;
               },
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              type: index == 1 ? 'kg' : 'cm',
+              type: index == 1 ? LocaleKeys.kg.tr() : null,
             ),
           )
             ..add(
@@ -272,7 +283,7 @@ Widget fatAdd(GlobalKey<FormState> formKey, BuildContext context) {
                   return Visibility(
                     visible: !fatSwitcher.value,
                     child: formField(
-                      fieldName: 'Hip girth',
+                      fieldName: LocaleKeys.hipGirth.tr(),
                       onSaved: (newValue) {
                         measures.addAll({'Hip girth': double.parse(newValue!)});
                         // print(newValue);
@@ -361,7 +372,7 @@ Widget switcherCustom() {
                       children: [
                         FittedBox(
                           child: Text(
-                            index == 0 ? 'Male' : 'Female',
+                            index == 0 ? LocaleKeys.male.tr() : LocaleKeys.female.tr(),
                             style: const TextStyle(
                               fontSize: 20,
                               color: Colors.white,
@@ -442,11 +453,11 @@ Widget switcherDefault(String page) {
                       child: Text(
                         index == 0
                             ? page == 'fat'
-                                ? 'Male'
-                                : 'Food'
+                                ? LocaleKeys.male.tr()
+                                : LocaleKeys.food.tr()
                             : page == 'fat'
-                                ? 'Female'
-                                : 'Expenditure',
+                                ? LocaleKeys.female.tr()
+                                : LocaleKeys.expenditure.tr(),
                         style: const TextStyle(
                           fontSize: 20,
                         ),
@@ -474,14 +485,14 @@ Widget addButton(GlobalKey<FormState> formKey, BuildContext context, Function() 
           formKey.currentState!.save();
           String result = saveTostorage();
           if (result == 'invalid data') {
-            showSnackAlert('Invalid data entered');
+            showSnackAlert(LocaleKeys.invalidDataEntered.tr());
             return;
           } else {
-            showSnackAlert('Added');
+            showSnackAlert(LocaleKeys.added.tr());
             formKey.currentState!.reset();
           }
         } else {
-          showSnackAlert('Fill in the fields');
+          showSnackAlert(LocaleKeys.fillInTheFields.tr());
         }
       },
       style: TextButton.styleFrom(
@@ -491,9 +502,9 @@ Widget addButton(GlobalKey<FormState> formKey, BuildContext context, Function() 
           borderRadius: BorderRadius.circular(10),
         ),
       ),
-      child: const Text(
-        'Add',
-        style: TextStyle(
+      child: Text(
+        LocaleKeys.add.tr(),
+        style: const TextStyle(
           fontSize: 24,
           color: Colors.white,
         ),

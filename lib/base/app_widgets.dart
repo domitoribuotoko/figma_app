@@ -1,4 +1,6 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:figma_app/base/app_constans.dart';
+import 'package:figma_app/generated/locale_keys.g.dart';
 import 'package:figma_app/screens/home_screen_pages/graphs_pages/fat_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -164,8 +166,8 @@ Widget tabButton({
     style: TextButton.styleFrom(
       backgroundColor: buttonColor,
       foregroundColor: Colors.white.withOpacity(0.8),
+      maximumSize: const Size(double.infinity, 50),
       minimumSize: Size(method.hSizeCalc(165), 50),
-      // maximumSize:  const Size(165, 41),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
@@ -182,11 +184,11 @@ Widget tabButton({
 
 Widget formField({
   required String fieldName,
-  String hintText = 'Numeric',
+  String? hintText,
   required Function(String?) onSaved,
   required String? Function(String?) validator,
   List<TextInputFormatter>? inputFormatters,
-  String type = 'cm',
+  String? type,
 }) {
   return Padding(
     padding: EdgeInsets.only(
@@ -209,12 +211,12 @@ Widget formField({
               suffixIcon: Padding(
                 padding: EdgeInsets.only(right: method.hSizeCalc(10)),
                 child: Text(
-                  type,
+                  type ?? LocaleKeys.cm.tr(),
                   style: tS.grey16TS1,
                 ),
               ),
               suffixIconConstraints: const BoxConstraints(minHeight: 0, minWidth: 0),
-              hintText: hintText,
+              hintText: hintText ?? LocaleKeys.numeric.tr(),
               fillColor: Colors.white,
               filled: true,
               isDense: true,

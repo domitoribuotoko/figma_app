@@ -1,3 +1,5 @@
+import 'package:easy_localization/easy_localization.dart';
+import 'package:figma_app/generated/locale_keys.g.dart';
 import 'package:flutter/material.dart';
 
 class AppColors {
@@ -60,7 +62,7 @@ final metrix = AppMetrix();
 
 class AppLongStrings {
   final String attentionText =
-      'The content in our app is not medical advice or a substitute for professional medical care, diagnosis or treatment. Your doctor will determine your specific needs and advise you personally during consultations on what medication to take.';
+      LocaleKeys.attentionText.tr();
   final String articleDesc =
       'C4 Pre-Workout supplements are a product line by Cellucor, a company that sells fitness equipment, drinks, and supplements.';
 }

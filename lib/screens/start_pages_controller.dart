@@ -1,6 +1,7 @@
-
+import 'package:easy_localization/easy_localization.dart';
 import 'package:figma_app/base/app_constans.dart';
 import 'package:figma_app/base/app_methods.dart';
+import 'package:figma_app/generated/locale_keys.g.dart';
 import 'package:figma_app/screens/home_screen_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -92,8 +93,8 @@ class _StartPagesControllerState extends State<StartPagesController> {
   showSheet() async {
     await showModalBottomSheet(
       constraints: BoxConstraints(
-        maxHeight: method.vSizeCalc(425),
-        maxWidth: metrix.screenWidth,
+        // maxHeight: method.vSizeCalc(500),
+        minHeight: method.vSizeCalc(425),
       ),
       context: context,
       shape: const RoundedRectangleBorder(
@@ -141,7 +142,7 @@ class StarPage extends StatelessWidget {
                 bottom: method.vSizeCalc(125),
               ),
               child: Text(
-                'Be the first',
+                LocaleKeys.beTheFirst.tr(),
                 style: tS.main36TS,
               ),
             ),
@@ -157,7 +158,7 @@ class StarPage extends StatelessWidget {
                 minimumSize: const Size(174, 82),
               ),
               child: Text(
-                'Next',
+                LocaleKeys.next.tr(),
                 style: tS.black36TS,
               ),
             ),
@@ -200,7 +201,7 @@ class DumbellPage extends StatelessWidget {
                 bottom: method.vSizeCalc(125),
               ),
               child: Text(
-                'Take care of yourself',
+                LocaleKeys.takeCareOfYourself.tr(),
                 style: tS.main36TS,
               ),
             ),
@@ -216,7 +217,7 @@ class DumbellPage extends StatelessWidget {
                 minimumSize: const Size(178, 82),
               ),
               child: Text(
-                'Start',
+                LocaleKeys.start.tr(),
                 style: tS.black36TS,
               ),
             ),
@@ -241,6 +242,7 @@ class BottomAttentionSheet extends StatelessWidget {
         top: method.vSizeCalc(10),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -249,7 +251,7 @@ class BottomAttentionSheet extends StatelessWidget {
                 width: method.hSizeCalc(24),
               ),
               Text(
-                'Attention',
+                LocaleKeys.attention.tr(),
                 style: tS.main36TS,
               ),
               GestureDetector(
@@ -262,20 +264,24 @@ class BottomAttentionSheet extends StatelessWidget {
               ),
             ],
           ),
-          Text(
-            longString.attentionText,
-            style: TextStyle(
-              fontSize: 16,
-              height: 1.7 * method.ratio(),
+          Padding(
+            padding: EdgeInsets.only(top: method.vSizeCalc(20)),
+            child: Text(
+              longString.attentionText,
+              style: TextStyle(
+                fontSize: 16,
+                height: 1.7 * method.ratio(),
+              ),
             ),
           ),
           Padding(
-            padding: EdgeInsets.only(top: method.vSizeCalc(41)),
+            padding: EdgeInsets.only(top: method.vSizeCalc(41), bottom: method.vSizeCalc(20)),
             child: TextButton(
               onPressed: () {
                 Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(
                   builder: (context) {
-                    return const HomeScreenController();
+                    // ignore: prefer_const_constructors
+                    return HomeScreenController();
                   },
                 ), (route) => false);
               },
@@ -287,7 +293,7 @@ class BottomAttentionSheet extends StatelessWidget {
                 minimumSize: Size(method.hSizeCalc(178), method.vSizeCalc(82)),
               ),
               child: Text(
-                'Start',
+                LocaleKeys.start.tr(),
                 style: tS.main36TS,
               ),
             ),

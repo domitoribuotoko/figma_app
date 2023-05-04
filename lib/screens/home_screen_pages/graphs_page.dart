@@ -1,15 +1,16 @@
 import 'dart:math';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:figma_app/base/app_classes.dart';
 import 'package:figma_app/base/app_config.dart';
 import 'package:figma_app/base/app_constans.dart';
 import 'package:figma_app/base/app_methods.dart';
 import 'package:figma_app/base/app_widgets.dart';
+import 'package:figma_app/generated/locale_keys.g.dart';
 import 'package:figma_app/screens/home_screen_pages/graphs_pages/calculate_page.dart';
 import 'package:figma_app/screens/home_screen_pages/graphs_pages/calories_details.dart';
 import 'package:figma_app/screens/home_screen_pages/graphs_pages/fat_details.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 late TabController graphPageTabController;
 ValueNotifier<int> tabGraphPageIndex = ValueNotifier<int>(0);
@@ -200,11 +201,11 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  DateFormat('dd.MM.y').format(item.date),
+                  method.dateFormat(item.date),
                   style: tS.grey16TS1,
                 ),
                 Text(
-                  '${(foodSumm - expendSumm)} kcal',
+                  '${(foodSumm - expendSumm)} ${LocaleKeys.kcal.tr()}',
                   style: tS.grey16TS1,
                 ),
               ],
@@ -225,15 +226,15 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Food',
-                        style: TextStyle(
+                      Text(
+                        LocaleKeys.food.tr(),
+                        style: const TextStyle(
                           fontSize: 20,
                           height: 1,
                         ),
                       ),
                       Text(
-                        '$foodSumm kcal',
+                        '$foodSumm ${LocaleKeys.kcal.tr()}',
                         style: tS.grey20TS1,
                       ),
                     ],
@@ -241,15 +242,15 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Expenditure',
-                        style: TextStyle(
+                      Text(
+                        LocaleKeys.expenditure.tr(),
+                        style: const TextStyle(
                           fontSize: 20,
                           height: 1,
                         ),
                       ),
                       Text(
-                        '-$expendSumm  kcal',
+                        '-$expendSumm  ${LocaleKeys.kcal.tr()}',
                         style: tS.grey20TS1,
                       ),
                     ],
@@ -310,12 +311,12 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
 
     String getFatString() {
       if (index == 0 || difference == null) {
-        return 'fat. %';
+        return '${LocaleKeys.fat.tr()}. %';
       } else {
         if (difference > 0) {
-          return '+fat. %';
+          return '+${LocaleKeys.fat.tr()}. %';
         } else {
-          return '-fat. %';
+          return '-${LocaleKeys.fat.tr()}. %';
         }
       }
     }
@@ -343,7 +344,7 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Text(
-                          DateFormat('dd.MM.y').format(item.date),
+                          method.dateFormat(item.date),
                           style: tS.grey16TS1,
                         ),
                       ],
@@ -384,7 +385,7 @@ class _GraphsPageState extends State<GraphsPage> with SingleTickerProviderStateM
                                 )
                               : Center(
                                   child: Text(
-                                    'Not recorded fat data this day',
+                                    LocaleKeys.notRecordedFatDataThisDay.tr(),
                                     style: TextStyle(
                                       fontSize: 20,
                                       color: colors.greyColor,
@@ -487,8 +488,8 @@ class DashboardHeaderPersistentDelegate extends SliverPersistentHeaderDelegate {
                             expendSumm = expendSumm + element.values.first;
                           }
                           return _topContainer(
-                            'Calories',
-                            '${(foodSumm - expendSumm).toInt()} kcal',
+                            LocaleKeys.calories.tr(),
+                            '${(foodSumm - expendSumm).toInt()} ${LocaleKeys.kcal.tr()}',
                             shrinkPercentage,
                             circularChart(
                               foodSumm,
@@ -506,7 +507,7 @@ class DashboardHeaderPersistentDelegate extends SliverPersistentHeaderDelegate {
                         valueListenable: config.daylyData,
                         builder: (context, value, _) {
                           return _topContainer(
-                            'Fat',
+                            LocaleKeys.fFat.tr(),
                             getDifference(),
                             shrinkPercentage,
                             cartesianChart(
@@ -536,7 +537,7 @@ class DashboardHeaderPersistentDelegate extends SliverPersistentHeaderDelegate {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Calculate',
+                        LocaleKeys.calculate.tr(),
                         style: TextStyle(
                           fontSize: 32,
                           color: colors.mainColor,
@@ -548,7 +549,8 @@ class DashboardHeaderPersistentDelegate extends SliverPersistentHeaderDelegate {
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) {
-                                return const CalculatePage();
+                                // ignore: prefer_const_constructors
+                                return  CalculatePage();
                               },
                             ),
                           );
@@ -556,14 +558,15 @@ class DashboardHeaderPersistentDelegate extends SliverPersistentHeaderDelegate {
                         style: TextButton.styleFrom(
                           backgroundColor: colors.redColor,
                           foregroundColor: Colors.white,
-                          maximumSize: Size(method.hSizeCalc(74), 50),
+                          maximumSize: const Size(double.infinity, 50),
+                          minimumSize: Size(method.hSizeCalc(74), 50),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        child: const Text(
-                          'Add',
-                          style: TextStyle(
+                        child: Text(
+                          LocaleKeys.add.tr(),
+                          style: const TextStyle(
                             fontSize: 20,
                             color: Colors.white,
                           ),
@@ -580,8 +583,8 @@ class DashboardHeaderPersistentDelegate extends SliverPersistentHeaderDelegate {
                     valueListenable: tabGraphPageIndex,
                     builder: (context, value, widget) {
                       return customTabBar(
-                        'Calories',
-                        'Fat',
+                        LocaleKeys.calories.tr(),
+                        LocaleKeys.fFat.tr(),
                         graphPageTabController,
                         tabGraphPageIndex,
                       );
@@ -606,7 +609,7 @@ class DashboardHeaderPersistentDelegate extends SliverPersistentHeaderDelegate {
         return '${config.f.format(dif)} %';
       }
     } else {
-      return 'No data';
+      return LocaleKeys.noData.tr();
     }
   }
 

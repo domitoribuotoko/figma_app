@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:easy_localization/easy_localization.dart' as locale;
 import 'package:figma_app/base/app_config.dart';
 import 'package:figma_app/base/app_constans.dart';
 import 'package:flutter/material.dart';
@@ -9,22 +10,18 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'app_classes.dart';
 import 'dart:ui' as ui;
 import 'dart:math' as math;
-import 'package:intl/intl.dart' as intl;
 import 'package:http/http.dart' as http;
 
 class AppMethods {
   initSp() async {
     config.sharedPreferences = await SharedPreferences.getInstance();
 
-    var value = config.sharedPreferences.getBool('fatSettings');
-    if (value == null) {
+    if (config.sharedPreferences.getBool('fatSettings') == null) {
       await config.sharedPreferences.setBool('fatSettings', true);
     }
     config.fatSettings = ValueNotifier<bool>(config.sharedPreferences.getBool('fatSettings')!);
-    value = null;
 
-    value = config.sharedPreferences.getBool('showFakeData');
-    if (value == null) {
+    if (config.sharedPreferences.getBool('showFakeData') == null) {
       await config.sharedPreferences.setBool('showFakeData', false);
     }
     config.isShowFakeData = ValueNotifier<bool>(config.sharedPreferences.getBool('showFakeData')!);
@@ -58,15 +55,15 @@ class AppMethods {
     return size;
   }
 
-  String dateToKey() {
-    return intl.DateFormat('dd.MM.y').format(
-      DateTime.now(),
+  String dateFormat(DateTime time) {
+    return locale.DateFormat('dd.MM.y').format(
+      time,
     );
   }
 
-  String dateFormat(DateTime time) {
-    return intl.DateFormat('dd.MM.y').format(
-      time,
+  String dateToKey() {
+    return method.dateFormat(
+      DateTime.now(),
     );
   }
 
@@ -282,7 +279,7 @@ class AppMethods {
     }
 
     double degreeToRadian(int deg) => deg * (math.pi / 180);
-    Float64List resolveTransform(Rect bounds, TextDirection textDirection) {
+    Float64List resolveTransform(Rect bounds, TextDirection? textDirection) {
       final GradientTransform transform = GradientRotation(degreeToRadian(-90));
       return transform.transform(bounds, textDirection: textDirection)!.storage;
     }

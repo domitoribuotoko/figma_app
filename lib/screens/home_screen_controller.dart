@@ -35,10 +35,14 @@ class _HomeScreenControllerState extends State<HomeScreenController> {
           },
           itemBuilder: (context, index) {
             return [
-              const ExercisePage(),
-              const GraphsPage(),
-              const ArticlesVideosPage(),
-              const DummyJson(),
+              // ignore: prefer_const_constructors
+              ExercisePage(),
+               // ignore: prefer_const_constructors
+              GraphsPage(),
+               // ignore: prefer_const_constructors
+              ArticlesVideosPage(),
+               // ignore: prefer_const_constructors
+              DummyJson(),
             ].elementAt(index);
           },
         ),
